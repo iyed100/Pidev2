@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .split-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .image-side {
+            flex: 1;
+            background: url('/images/background.jpg') center/cover no-repeat;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .image-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .form-side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: white;
+        }
+
+        .signup-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+        }
+
+        .signup-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 1rem;
+        }
+
+        .btn-signup {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            width: 100%;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #6a11cb;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .split-container {
+                flex-direction: column;
+            }
+            
+            .image-side {
+                min-height: 300px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="split-container">
+        <!-- Left Side with Background Image -->
+        <div class="image-side">
+            <div class="image-overlay"></div>
+            <div class="image-content">
+                <h1 class="animate__animated animate__fadeInDown" style="font-size: 2.5rem; margin-bottom: 1rem;">
+                    Bienvenue sur notre plateforme
+                </h1>
+                <p class="animate__animated animate__fadeInUp" style="font-size: 1.2rem;">
+                    Rejoignez notre communauté et profitez d'une expérience unique
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Side with Form -->
+        <div class="form-side">
+            <div class="signup-card animate__animated animate__fadeIn">
+                <h1 class="signup-title">Créer un compte</h1>
+                
+                {{ form_start(registrationForm, {'attr': {'class': 'row g-3'}}) }}
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.nom, {
+                            'label': 'Nom',
+                            'attr': {'class': 'form-control', 'placeholder': 'Votre nom'}
+                        }) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.prenom, {
+                            'label': 'Prénom',
+                            'attr': {'class': 'form-control', 'placeholder': 'Votre prénom'}
+                        }) }}
+                    </div>
+
+                    <div class="col-12">
+                        {{ form_row(registrationForm.email, {
+                            'label': 'Email',
+                            'attr': {'class': 'form-control', 'placeholder': 'exemple@email.com'}
+                        }) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.age, {
+                            'label': 'Âge',
+                            'attr': {'class': 'form-control', 'min': 18}
+                        }) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(registrationForm.password, {
+                            'label': 'Mot de passe',
+                            'attr': {'class': 'form-control', 'placeholder': '••••••••'}
+                        }) }}
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn-signup">
+                            S'inscrire
+                        </button>
+                    </div>
+                {{ form_end(registrationForm) }}
+
+                <div class="login-link">
+                    Vous avez déjà un compte? <a href="{{ path('app_login') }}">Connectez-vous ici</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
