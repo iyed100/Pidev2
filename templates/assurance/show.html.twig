@@ -1,0 +1,205 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l'Assurance #{{ assurance.id }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <a href="{{ path('app_assurance_index') }}" class="btn btn-outline-secondary mb-4">
+                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+            </a>
+            
+            <div class="card shadow-lg animate__animated animate__fadeInUp">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">
+                            <i class="fas fa-file-contract me-2"></i>Détails de l'Assurance
+                        </h2>
+                        <span class="badge bg-{% if assurance.statut == 'Actif' %}success{% elseif assurance.statut == 'Expiré' %}danger{% else %}warning{% endif %}">
+                            {{ assurance.statut }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-card mb-4">
+                                <h3 class="h5 text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Informations de base
+                                </h3>
+                                <div class="table-responsive">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <th class="w-40">ID</th>
+                                                <td>#{{ assurance.id }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Type</th>
+                                                <td>
+                                                    <span class="badge bg-{% if assurance.type == 'Auto' %}danger{% elseif assurance.type == 'Santé' %}success{% else %}info{% endif %}">
+                                                        {{ assurance.type }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Montant</th>
+                                                <td class="fw-bold">{{ assurance.montant }} €</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="info-card mb-4">
+                                <h3 class="h5 text-primary mb-3">
+                                    <i class="fas fa-calendar-alt me-2"></i>Dates clés
+                                </h3>
+                                <div class="table-responsive">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <th class="w-40">Souscription</th>
+                                                <td>{{ assurance.dateSouscription|date('d/m/Y') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Expiration</th>
+                                                <td class="{% if assurance.dateExpiration < date() %}text-danger fw-bold{% endif %}">
+                                                    {{ assurance.dateExpiration|date('d/m/Y') }}
+                                                    {% if assurance.dateExpiration < date() %}
+                                                        <span class="badge bg-danger ms-2">Expiré</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Durée restante</th>
+                                                <td>
+                                                    {% set difference = date(assurance.dateExpiration).diff(date()) %}
+                                                    {{ difference.days }} jours
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="info-card">
+                                <h3 class="h5 text-primary mb-3">
+                                    <i class="fas fa-file-signature me-2"></i>Conditions
+                                </h3>
+                                <div class="p-3 bg-light rounded">
+                                    {{ assurance.conditions|nl2br }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="{{ path('app_assurance_edit', {'id': assurance.id}) }}" class="btn btn-warning">
+                                <i class="fas fa-edit me-2"></i>Modifier
+                            </a>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="fas fa-trash-alt me-2"></i>Supprimer
+                            </button>
+                        </div>
+                        <small class="text-muted">
+                            Dernière mise à jour : {{ assurance.dateSouscription|date('d/m/Y à H:i') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'assurance #{{ assurance.id }} ?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cette action est irréversible !
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_assurance_delete', {'id': assurance.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ assurance.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>Confirmer la suppression
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+        border: none;
+    }
+    .card-header.bg-gradient-primary {
+        background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+    }
+    .info-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    .table-borderless th {
+        width: 40%;
+        color: #6c757d;
+    }
+    @media (max-width: 768px) {
+        .table-borderless th, 
+        .table-borderless td {
+            display: block;
+            width: 100%;
+        }
+        .table-borderless tr {
+            margin-bottom: 1rem;
+            display: block;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Animation pour les éléments
+document.addEventListener('DOMContentLoaded', function() {
+    // Tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+});
+</script>
+{% endblock %}

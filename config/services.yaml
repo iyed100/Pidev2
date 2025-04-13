@@ -1,0 +1,19 @@
+parameters:
+    hotel_image_directory: '%kernel.project_dir%/public/uploads/hotels'
+
+services:
+    App\Service\FileUploader:
+        arguments:
+            $targetDirectory: '%hotel_image_directory%'
+            $slugger: '@Symfony\Component\String\Slugger\SluggerInterface'
+
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
