@@ -1,0 +1,804 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+
+
+
+    
+
+
+
+     :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+        }
+        /* Your existing styles... */
+        
+        /* Add these new styles */
+        .hero-section {
+            background: url('/images/background.jpg') center/cover no-repeat;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .navbar a { 
+            color: white !important; 
+            font-weight: 500;
+        }
+        
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1rem;
+        }
+        
+        .hero-text p {
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .booking-form {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 1200px;
+}
+
+.form-select-lg, .form-control-lg {
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 1px solid #e0e0e0;
+}
+
+.form-label {
+    margin-bottom: 8px;
+    display: block;
+    color: #555;
+}
+
+.btn-lg {
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+        
+        /* Offers Section */
+        .offers-section {
+            padding: 150px 0 80px;
+            background-color: #f8f9fa;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 2.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        }
+        
+        .nav-arrows {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .arrow-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary-color);
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .arrow-btn:hover {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Cards */
+        .card-special {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            background: white;
+            height: 100%;
+        }
+        
+        .card-special:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card-img-container {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card-img-top {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .card-special:hover .card-img-top {
+            transform: scale(1.05);
+        }
+        
+        .card-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .star-rating {
+            color: #FFD700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-text {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+        }
+        
+        .price-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .btn-details {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .btn-details:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+        /* Events Section */
+.events-section {
+    position: relative;
+    background-color: #f8f9fa;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+}
+
+.citation-text {
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.event-card {
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.event-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.event-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255,255,255,0.9);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6a11cb;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.event-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.event-description {
+    color: #7f8c8d;
+    line-height: 1.6;
+}
+
+.event-duration {
+    font-weight: 600;
+    color: #6a11cb;
+}
+
+.event-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2575fc;
+}
+
+.inspiration-box {
+    border-left: 4px solid #6a11cb;
+    border-radius: 4px;
+    max-width: 300px;
+}
+/* Destinations Section */
+.destinations-section {
+    position: relative;
+}
+
+.section-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.destinations-carousel {
+    overflow: hidden;
+    position: relative;
+}
+
+.destinations-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.5s ease;
+    padding-bottom: 20px;
+}
+
+.destination-card {
+    min-width: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    background: white;
+}
+
+.destination-card:hover {
+    transform: translateY(-5px);
+}
+
+.destination-card .card-img-top {
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+}
+
+.destination-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.destination-card:hover img {
+    transform: scale(1.05);
+}
+
+.location-badge {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+}
+
+.location-badge i {
+    margin-right: 5px;
+    color: #ff4757;
+}
+
+.rating-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.rating-badge i {
+    color: #FFD700;
+    margin-right: 3px;
+}
+
+.destinations-arrows {
+    display: flex;
+    gap: 10px;
+}
+
+.arrow-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    color: #6a11cb;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.arrow-btn:hover {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    transform: translateY(-2px);
+}
+    /* Destinations Carousel */
+        .destinations-carousel {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        
+        .destinations-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease-in-out;
+            padding-bottom: 20px;
+            will-change: transform;
+        }
+        
+        .destination-card {
+            flex: 0 0 auto;
+            width: 280px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .location-badge {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .destinations-arrows .arrow-btn[style*="hidden"] {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        
+
+
+    /* Add these to your existing styles */
+    .form-container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        margin-bottom: 30px;
+    }
+    
+    .action-buttons {
+        white-space: nowrap;
+    }
+    
+    .action-buttons form {
+        display: inline-block;
+        margin-left: 5px;
+    }
+    
+    .badge {
+        font-size: 0.9em;
+        padding: 5px 10px;
+    }
+
+
+
+    
+
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" width="50" height="50">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Hébergement</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Espace de coworking</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Événements</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Avis et réclamation</a></li>
+                    </ul>
+                    <a href="#" class="btn btn-outline-light me-2">Login</a>
+                    <a href="#" class="btn btn-danger">Sign up</a>
+                </div>
+            </div>
+        </nav>
+        <div class="hero-text container">
+            <h1 class="animate__animated animate__fadeInDown">Commencez votre inoubliable voyage d'affaires avec nous.</h1>
+            <p class="animate__animated animate__fadeInUp animate__delay-1s">Le meilleur voyage pour votre voyage commence dès maintenant.</p>
+        </div>
+
+
+
+        
+        <div class="booking-form animate__animated animate__fadeInUp animate__delay-2s">
+    {{ form_start(search_form, {'attr': {'class': 'row g-3 align-items-end'}}) }}
+        <div class="col-md-10">
+            {{ form_widget(search_form.keyword) }}
+        </div>
+        <div class="col-md-2">
+            {{ form_widget(search_form.search) }}
+        </div>
+    {{ form_end(search_form) }}
+        </div>
+
+
+
+
+    </header>
+
+    <!-- Avis Section -->
+    <section class="avis-section">
+        <div class="container">
+            <div class="page-header animate__animated animate__fadeIn">
+                <h1 class="page-title">Gestion des Avis</h1>
+                <button id="toggleForm" class="btn btn-details">
+                    <i class="fas fa-plus me-2"></i> Nouvel Avis
+                </button>
+            </div>
+            
+            <!-- Add/Edit Form (hidden by default) -->
+           <div id="avisForm" class="form-modal">
+    {% if avis_form is defined %}
+        {{ form_start(avis_form, {
+            'attr': {
+                'class': 'row g-3',
+                'id': 'avis-form'
+            }
+        }) }}
+            <div class="col-md-6">
+                {{ form_label(avis_form.serviceId, 'Service ID') }}
+                {{ form_widget(avis_form.serviceId, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            
+            <div class="col-md-12">
+                {{ form_label(avis_form.note, 'Rating') }}
+                <div class="star-rating mb-3">
+                    {% for i in 5..1 %}
+                        <i class="far fa-star" data-value="{{ i }}"></i>
+                    {% endfor %}
+                    {{ form_widget(avis_form.note, {'attr': {'class': 'd-none'}}) }}
+                </div>
+            </div>
+            
+            <div class="col-md-12">
+                {{ form_label(avis_form.comment, 'Comment') }}
+                {{ form_widget(avis_form.comment, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+            </div>
+            
+            <div class="col-md-12 text-end">
+                <button type="button" id="cancelForm" class="btn btn-secondary me-2">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        {{ form_end(avis_form) }}
+    {% endif %}
+</div>
+            
+            <div class="avis-table-container">
+                <table class="table avis-table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Service ID</th>
+                            <th>Note</th>
+                            <th>Commentaire</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for avi in avis %}
+                        <tr>
+                            <td>{{ avi.id }}</td>
+                            <td>{{ avi.userId }}</td>
+                            <td>{{ avi.serviceId }}</td>
+                            <td>
+                                {% if avi.note %}
+                                    {% for i in 1..5 %}
+                                        {% if i <= avi.note %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </td>
+                            <td class="comment-cell" title="{{ avi.comment }}">
+                                {{ avi.comment|length > 30 ? avi.comment|slice(0, 30) ~ '...' : avi.comment }}
+                            </td>
+                            <td class="action-buttons">
+                                <a href="{{ path('avis_edit', {'id': avi.id}) }}" class="btn btn-sm btn-edit me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="{{ path('avis_delete', {'id': avi.id}) }}" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ avi.id) }}">
+                                    <button class="btn btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucun avis trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+<section class="claims-section mt-5">
+    <div class="container">
+        <div class="page-header animate__animated animate__fadeIn">
+            <h1 class="page-title">Gestion de reclamation</h1>
+            <p class="text-muted">Submit and track your claims</p>
+        </div>
+
+        <!-- Claim Form -->
+        <div class="form-container mb-5">
+            <h3>Create New Claim</h3>
+            {{ form_start(claim_form) }}
+                {{ form_row(claim_form.description) }}
+                <button type="submit" class="btn btn-success">Submit Claim</button>
+            {{ form_end(claim_form) }}
+        </div>
+
+        <!-- Claims List -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Responses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for claim in claims %}
+                    <tr>
+                        <td>{{ claim.id }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if claim.status == 'Pending' %}bg-warning
+                                {% elseif claim.status == 'Approved' %}bg-success
+                                {% else %}bg-danger
+                                {% endif %}">
+                                {{ claim.status }}
+                            </span>
+                        </td>
+                        <td>{{ claim.cdate|date('Y-m-d') }}</td>
+                        <td>{{ claim.description|length > 50 ? claim.description|slice(0, 50) ~ '...' : claim.description }}</td>
+                        <td>
+                            {% if claim.responses|length > 0 %}
+                                <button class="btn btn-sm btn-info" data-bs-toggle="collapse" 
+                                        data-bs-target="#responses-{{ claim.id }}">
+                                    <i class="fas fa-comments"></i> ({{ claim.responses|length }})
+                                </button>
+                            {% else %}
+                                <span class="text-muted">No responses yet</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if claim.responses|length > 0 %}
+                    <tr class="collapse" id="responses-{{ claim.id }}">
+                        <td colspan="5">
+                            <div class="response-container p-3 bg-light">
+                                {% for response in claim.responses %}
+                                    <div class="response mb-3 p-2 bg-white rounded">
+                                        <p>{{ response.content }}</p>
+                                        <small class="text-muted">
+                                            {{ response.createdAt|date('Y-m-d H:i') }}
+                                        </small>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No claims found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+</section>
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle form visibility
+            const toggleForm = document.getElementById('toggleForm');
+            const avisForm = document.getElementById('avisForm');
+            const cancelForm = document.getElementById('cancelForm');
+            
+            toggleForm.addEventListener('click', function() {
+                avisForm.classList.toggle('show');
+            });
+            
+            cancelForm.addEventListener('click', function() {
+                avisForm.classList.remove('show');
+            });
+            
+            // STAR RATING FUNCTIONALITY - REPLACE THIS SECTION
+            const stars = document.querySelectorAll('.star-rating i');
+            const noteInput = document.querySelector('#avis_note');
+            
+            if (stars && noteInput) {
+                // Initialize with empty value
+                noteInput.value = '';
+                
+                stars.forEach(star => {
+                    star.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        noteInput.value = value;
+                        
+                        // Update star display
+                        stars.forEach((s, index) => {
+                            if (index < 5 - value + 1) {
+                                s.classList.add('fas');
+                                s.classList.remove('far');
+                            } else {
+                                s.classList.add('far');
+                                s.classList.remove('fas');
+                            }
+                        });
+                    });
+                });
+            }
+            
+            // Check if we're in edit mode and show form
+            {% if editMode|default(false) %}
+                avisForm.classList.add('show');
+                // Scroll to form
+                avisForm.scrollIntoView({ behavior: 'smooth' });
+            {% endif %}
+            
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 100);
+            });
+        });
+    </script>
+
+   
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block body %}
+<!-- Stats Row -->
+
+
+<!-- Products Table -->
+<div class="card-elegent card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Listes des Utilisateurs</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Prenom</th>
+                <th>Age</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Role</th>
+                <th>CreatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for utilisateur in utilisateurs %}
+            <tr>
+                <td>{{ utilisateur.id }}</td>
+                <td>{{ utilisateur.nom }}</td>
+                <td>{{ utilisateur.prenom }}</td>
+                <td>{{ utilisateur.age }}</td>
+                <td>{{ utilisateur.email }}</td>
+                <td>{{ utilisateur.password }}</td>
+                <td>{{ utilisateur.role }}</td>
+                <td>{{ utilisateur.createdAt ? utilisateur.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                        {{ include('utilisateur/_delete_form.html.twig') }}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
