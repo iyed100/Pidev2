@@ -493,10 +493,10 @@
     </a>
 </li>
 <li class="nav-item">
-    <a class="nav-link" href="{{ path('app_assurance_index') }}">
+        <a class="nav-link" href="{{ path('app_assurance_index') }}">
         <i class="bi bi-calendar-check me-1"></i> Mes Assurance
-    </a>
-</li>
+        </a>
+        </li>
             </ul>
 
             {% if user %}
@@ -576,40 +576,44 @@
             
             <div class="row">
                 {% for offre in offres %}
-                <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card-offre-complete">
-                <!-- Photo de l'hôtel -->
-                 <div class="card-img-container">
-                <img src="{{ asset('uploads/hotels/' ~ offre.hotel.image) }}" 
-                     alt="{{ offre.hotel.nom }}" 
-                     class="img-fluid">
-                </div>
-            
-                <div class="card-body">
-                <!-- Nom de l'hôtel -->
-                <h3 class="hotel-name">{{ offre.hotel.nom }}</h3>
-                
-                <!-- Espace de coworking associé -->
-                {% if offre.coworking %}
-                <div class="coworking-info">
-                    <i class="fas fa-building"></i>
-                    <span>{{ offre.coworking.nom }}</span>
-                </div>
-                {% endif %}
-                
-                <!-- Transport associé -->
-                {% if offre.transport %}
-                <div class="transport-info">
-                    <i class="fas fa-bus"></i>
-                    <span>{{ offre.transport.nom }} ({{ offre.transport.type }})</span>
-                </div>
-                {% endif %}
-                
-                <button class="btn-reserver">
-                    Réserver cette offre
-                </button>
-            </div>
+<div class="col-lg-4 col-md-6 mb-4">
+    <div class="card-offre-complete">
+        <!-- Photo de l'hôtel -->
+        <div class="card-img-container">
+            <img src="{{ asset('uploads/hotels/' ~ offre.hotel.image) }}" 
+                 alt="{{ offre.hotel.nom }}" 
+                 class="img-fluid">
         </div>
+    
+        <div class="card-body">
+            <!-- Nom de l'hôtel -->
+            <h3 class="hotel-name">{{ offre.hotel.nom }}</h3>
+            
+            <!-- Espace de coworking associé -->
+            {% if offre.coworking %}
+            <div class="coworking-info">
+                <i class="fas fa-building"></i>
+                <span>{{ offre.coworking.nom }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Transport associé -->
+            {% if offre.transport %}
+            <div class="transport-info">
+                <i class="fas fa-bus"></i>
+                <span>{{ offre.transport.nom }} ({{ offre.transport.type }})</span>
+            </div>
+            {% endif %}
+            
+            <a href="{{ path('app_reservation_new', {
+                'idhotel': offre.hotel.id,
+                'idspace': offre.coworking ? offre.coworking.id : null,
+                'idtransport': offre.transport ? offre.transport.id : null
+            }) }}" class="btn btn-reserver">
+                Réserver cette offre
+            </a>
+             </div>
+          </div>
     </div>
     {% endfor %}
 </div>

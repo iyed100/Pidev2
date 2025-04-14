@@ -1,95 +1,255 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Détails Réservation #{{ reservation.id }}{% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .detail-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border: none;
-        }
-        .card-header-custom {
-            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+        /* Hero Section */
+        .hero-section {
+            background: url('/images/background.jpg') center/cover no-repeat;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
             color: white;
-            border-radius: 10px 10px 0 0 !important;
+            position: relative;
         }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.5) !important;
+            transition: all 0.3s;
+        }
+        
+        .navbar.scrolled {
+            background: rgba(0, 0, 0, 0.9) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar a { 
+            color: white !important; 
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .navbar a:hover {
+            opacity: 0.8;
+        }
+
+        /* Reservation Show Section */
+        .reservation-container {
+            margin-top: 80px;
+            margin-bottom: 40px;
+        }
+        
+        .detail-card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+        
         .detail-table {
             margin-bottom: 0;
         }
+        
+        .detail-table th {
+            width: 40%;
+            font-weight: 600;
+            color: #555;
+        }
+        
         .detail-table td {
             padding: 1rem;
             border-top: 1px solid #f1f1f1;
         }
+        
         .detail-table tr:first-child td {
             border-top: none;
         }
+        
         .badge-detail {
-            font-size: 0.9em;
-            padding: 0.5em 0.8em;
+            font-size: 0.85em;
+            padding: 0.5em 0.75em;
+            font-weight: 500;
         }
-        .action-btns .btn {
-            border-radius: 6px;
-            padding: 0.5rem 1.25rem;
+        
+        .service-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            border-radius: 50px;
+            background: #f8f9fa;
+            margin-right: 0.5em;
+            margin-bottom: 0.5em;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .reservation-container {
+                margin-top: 60px;
+            }
+            
+            .card-header-custom {
+                padding: 1rem;
+            }
+            
+            .detail-table th, 
+            .detail-table td {
+                padding: 0.75rem;
+                display: block;
+                width: 100%;
+            }
+            
+            .detail-table tr {
+                margin-bottom: 0.5rem;
+                display: block;
+            }
         }
     </style>
 {% endblock %}
 
+{% block title %}Détails Réservation #{{ reservation.id }}{% endblock %}
+
 {% block body %}
-<div class="container py-4">
+<!-- Hero Section with Navbar -->
+<header class="hero-section">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" width="50" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Hébergement</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Espace de coworking</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Événements</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Avis et réclamation</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_reservation_index') }}">
+                            <i class="fas fa-calendar-check me-1"></i> Mes Réservations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_hotel_index') }}">
+                            <i class="fas fa-hotel me-1"></i> Hotels
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_assurance_index') }}">
+                            <i class="fas fa-shield-alt me-1"></i> Mes Assurances
+                        </a>
+                    </li>
+                </ul>
+
+                
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Reservation Details Section -->
+<div class="container reservation-container">
     <div class="card detail-card">
-        <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <div class="card-header card-header-custom">
             <h1 class="h4 mb-0">
                 <i class="fas fa-calendar-check me-2"></i>
-                Détails de la Réservation #{{ reservation.id }}
+                Réservation #{{ reservation.id }}
             </h1>
-            <span class="badge bg-{% if reservation.statut == 'confirmé' %}success{% else %}warning{% endif %}">
-                {{ reservation.statut }}
-            </span>
         </div>
         
         <div class="card-body">
-            <table class="table detail-table">
-                <tbody>
-                    <tr>
-                        <th width="30%">ID</th>
-                        <td>#{{ reservation.id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Nombre de nuits</th>
-                        <td>{{ reservation.nbrnuit }}</td>
-                    </tr>
-                    <tr>
-                        <th>Nombre d'heures</th>
-                        <td>{{ reservation.nbrheure }}</td>
-                    </tr>
-                    <tr>
-                        <th>Type de service</th>
-                        <td>
-                            <span class="badge badge-detail 
-                                {% if reservation.typeservice == 'Hôtel' %}bg-info
-                                {% elseif reservation.typeservice == 'Restaurant' %}bg-warning text-dark
-                                {% else %}bg-secondary
-                                {% endif %}">
-                                {{ reservation.typeservice }}
-                            </span>
-                        </td>
-                    </tr>
-                   
-                </tbody>
-            </table>
+            <div class="row">
+                <!-- Left Column - Reservation Info -->
+                <div class="col-lg-6">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Détails réservation
+                    </h5>
+                    <table class="table table-sm detail-table">
+                        <tr>
+                            <th>Statut</th>
+                            <td>
+                                <span class="badge bg-{% if reservation.statut == 'confirmé' %}success{% else %}warning{% endif %} badge-detail">
+                                    {{ reservation.statut }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type service</th>
+                            <td>
+                                <span class="badge bg-info badge-detail">
+                                    {{ reservation.typeservice }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Nombre de nuits</th>
+                            <td>{{ reservation.nbrnuit }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nombre d'heures</th>
+                            <td>{{ reservation.nbrheure }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Right Column - Services -->
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-concierge-bell me-2"></i>Services réservés
+                    </h5>
+                    <table class="table table-sm detail-table">
+                        {% if reservation.hotel %}
+                        <tr>
+                            <th>Hôtel</th>
+                            <td>
+                                <span class="service-badge">
+                                    <i class="fas fa-hotel me-1"></i> {{ reservation.hotel.nom }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if reservation.coworkingSpace %}
+                        <tr>
+                            <th>Espace coworking</th>
+                            <td>
+                                <span class="service-badge">
+                                    <i class="fas fa-building me-1"></i> {{ reservation.coworkingSpace.nom }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        
+                        {% if reservation.transportMean %}
+                        <tr>
+                            <th>Transport</th>
+                            <td>
+                                <span class="service-badge">
+                                    <i class="fas fa-bus me-1"></i> {{ reservation.transportMean.nom }} ({{ reservation.transportMean.type }})
+                                </span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
 
-            <div class="action-btns d-flex justify-content-between mt-4">
-                <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-secondary">
+            <div class="text-end mt-4">
+                <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left me-1"></i> Retour à la liste
                 </a>
-                <div>
-                    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-warning me-2">
-                        <i class="fas fa-edit me-1"></i> Modifier
-                    </a>
-                    {{ include('reservation/_delete_form.html.twig') }}
-                </div>
+                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-primary ms-2">
+                    <i class="fas fa-edit me-1"></i> Modifier
+                </a>
             </div>
         </div>
     </div>
@@ -99,14 +259,19 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        // Animation pour les boutons
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('mouseenter', () => {
-                btn.style.transform = 'translateY(-2px)';
-            });
-            btn.addEventListener('mouseleave', () => {
-                btn.style.transform = 'none';
-            });
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+        
+        // Auto-scroll to content after hero section
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.scrollTo({
+                    top: document.querySelector('.reservation-container').offsetTop - 70,
+                    behavior: 'smooth'
+                });
+            }, 500);
         });
     </script>
 {% endblock %}

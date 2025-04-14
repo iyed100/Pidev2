@@ -153,7 +153,7 @@ public function index(
 
             $this->addFlash('success', 'Registration successful! You can now login.');
 
-            //return $this->redirectToRoute('app_login');
+           return $this->redirectToRoute('app_login');
         }
 
         return $this->render('acceuil/signup.html.twig', [

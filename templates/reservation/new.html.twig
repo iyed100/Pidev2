@@ -1,11 +1,282 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Reservation{% endblock %}
+{% block stylesheets %}
+<style>
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Create new Reservation</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">Nouvelle Réservation</h1>
+                </div>
+                
+                <div class="card-body">
+                    {# Affichage des erreurs globales #}
+                    {% for flashError in app.flashes('error') %}
+                        <div class="alert alert-danger mb-4">
+                            {{ flashError }}
+                        </div>
+                    {% endfor %}
 
-    {{ include('reservation/_form.html.twig') }}
+                    {% if form.hotel.vars.disabled and reservation.hotel %}
+                        <div class="alert alert-info mb-4">
+                            <h4 class="alert-heading">Hôtel sélectionné</h4>
+                            <p>{{ reservation.hotel.nom }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if form.coworkingSpace is defined and form.coworkingSpace.vars.disabled and reservation.coworkingSpace %}
+                        <div class="alert alert-info mb-4">
+                            <h4 class="alert-heading">Espace de coworking sélectionné</h4>
+                            <p>{{ reservation.coworkingSpace.nom }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if form.transportMean.vars.disabled and reservation.transportMean %}
+                        <div class="alert alert-info mb-4">
+                            <h4 class="alert-heading">Transport sélectionné</h4>
+                            <p>{{ reservation.transportMean.nom }} ({{ reservation.transportMean.type }})</p>
+                        </div>
+                    {% endif %}
 
-    <a href="{{ path('app_reservation_index') }}">back to list</a>
+                    {{ form_start(form, {'attr': {'id': 'reservation-form', 'novalidate': 'novalidate'}}) }}
+                        {# Champ statut caché #}
+                        {{ form_widget(form.statut, {'attr': {'class': 'd-none'}}) }}
+                        
+                        {# Typeservice #}
+                        <div class="mb-3">
+                            {{ form_label(form.typeservice, 'Type de service', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.typeservice, {'attr': {'class': 'form-control' ~ (form.typeservice.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            {% if form.typeservice.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.typeservice.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {# Hotel #}
+                        {% if form.hotel is defined %}
+                            <div class="mb-3">
+                                {{ form_label(form.hotel, 'Hôtel', {'label_attr': {'class': 'required-field'}}) }}
+                                {{ form_widget(form.hotel, {'attr': {'class': 'form-control' ~ (form.hotel.vars.errors|length ? ' is-invalid' : '')}}) }}
+                                {% if form.hotel.vars.errors %}
+                                    <div class="error-message">
+                                        {% for error in form.hotel.vars.errors %}
+                                            {{ error.message }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        {# CoworkingSpace #}
+                        {% if form.coworkingSpace is defined %}
+                            <div class="mb-3">
+                                {{ form_label(form.coworkingSpace, 'Espace de coworking', {'label_attr': {'class': 'required-field'}}) }}
+                                {{ form_widget(form.coworkingSpace, {'attr': {'class': 'form-control' ~ (form.coworkingSpace.vars.errors|length ? ' is-invalid' : '')}}) }}
+                                {% if form.coworkingSpace.vars.errors %}
+                                    <div class="error-message">
+                                        {% for error in form.coworkingSpace.vars.errors %}
+                                            {{ error.message }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        {# TransportMean #}
+                        <div class="mb-3">
+                            {{ form_label(form.transportMean, 'Moyen de transport', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.transportMean, {'attr': {'class': 'form-control' ~ (form.transportMean.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            {% if form.transportMean.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.transportMean.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {# Nombre de nuits #}
+                        <div class="mb-3">
+                            {{ form_label(form.nbrnuit, 'Nombre de nuits', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.nbrnuit, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.nbrnuit.vars.errors|length ? ' is-invalid' : ''),
+                                    'min': '1'
+                                }
+                            }) }}
+                            {% if form.nbrnuit.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.nbrnuit.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {# Nombre d'heures #}
+                        <div class="mb-3">
+                            {{ form_label(form.nbrheure, 'Nombre d\'heures', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.nbrheure, {
+                                'attr': {
+                                    'class': 'form-control' ~ (form.nbrheure.vars.errors|length ? ' is-invalid' : ''),
+                                    'min': '1'
+                                }
+                            }) }}
+                            {% if form.nbrheure.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.nbrheure.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary mt-3">
+                            <i class="fas fa-save me-1"></i> Confirmer la réservation
+                        </button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reservation-form');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validation du type de service
+        const typeservice = form.querySelector('[name$="[typeservice]"]');
+        if (!typeservice.value) {
+            typeservice.classList.add('is-invalid');
+            showError(typeservice, 'Le type de service est obligatoire');
+            isValid = false;
+        } else {
+            typeservice.classList.remove('is-invalid');
+            removeError(typeservice);
+        }
+        
+        // Validation de l'hôtel (si présent)
+        const hotel = form.querySelector('[name$="[hotel]"]');
+        if (hotel && !hotel.value) {
+            hotel.classList.add('is-invalid');
+            showError(hotel, 'L\'hôtel est obligatoire');
+            isValid = false;
+        } else if (hotel) {
+            hotel.classList.remove('is-invalid');
+            removeError(hotel);
+        }
+        
+        // Validation de l'espace de coworking (si présent)
+        const coworkingSpace = form.querySelector('[name$="[coworkingSpace]"]');
+        if (coworkingSpace && !coworkingSpace.value) {
+            coworkingSpace.classList.add('is-invalid');
+            showError(coworkingSpace, 'L\'espace de coworking est obligatoire');
+            isValid = false;
+        } else if (coworkingSpace) {
+            coworkingSpace.classList.remove('is-invalid');
+            removeError(coworkingSpace);
+        }
+        
+        // Validation du transport
+        const transportMean = form.querySelector('[name$="[transportMean]"]');
+        if (!transportMean.value) {
+            transportMean.classList.add('is-invalid');
+            showError(transportMean, 'Le moyen de transport est obligatoire');
+            isValid = false;
+        } else {
+            transportMean.classList.remove('is-invalid');
+            removeError(transportMean);
+        }
+        
+        // Validation du nombre de nuits
+        const nbrnuit = form.querySelector('[name$="[nbrnuit]"]');
+        if (!nbrnuit.value || parseInt(nbrnuit.value) <= 0) {
+            nbrnuit.classList.add('is-invalid');
+            showError(nbrnuit, 'Le nombre de nuits doit être supérieur à 0');
+            isValid = false;
+        } else {
+            nbrnuit.classList.remove('is-invalid');
+            removeError(nbrnuit);
+        }
+        
+        // Validation du nombre d'heures
+        const nbrheure = form.querySelector('[name$="[nbrheure]"]');
+        if (!nbrheure.value || parseInt(nbrheure.value) <= 0) {
+            nbrheure.classList.add('is-invalid');
+            showError(nbrheure, 'Le nombre d\'heures doit être supérieur à 0');
+            isValid = false;
+        } else {
+            nbrheure.classList.remove('is-invalid');
+            removeError(nbrheure);
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Scroll vers la première erreur
+            const firstError = form.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+    
+    // Fonctions utilitaires
+    function showError(field, message) {
+        let errorDiv = field.nextElementSibling;
+        if (!errorDiv || !errorDiv.classList.contains('error-message')) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            field.parentNode.insertBefore(errorDiv, field.nextSibling);
+        }
+        errorDiv.textContent = message;
+    }
+    
+    function removeError(field) {
+        const errorDiv = field.nextElementSibling;
+        if (errorDiv && errorDiv.classList.contains('error-message')) {
+            errorDiv.remove();
+        }
+    }
+    
+    // Validation en temps réel
+    const fields = ['typeservice', 'hotel', 'coworkingSpace', 'transportMean', 'nbrnuit', 'nbrheure'];
+    fields.forEach(fieldName => {
+        const field = form.querySelector(`[name$="[${fieldName}]"]`);
+        if (field) {
+            field.addEventListener('input', function() {
+                if (this.value) {
+                    this.classList.remove('is-invalid');
+                    removeError(this);
+                }
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

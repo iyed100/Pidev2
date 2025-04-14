@@ -3,6 +3,48 @@
 {% block title %}Gestion des Assurances{% endblock %}
 
 {% block body %}
+<header class="hero-section">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" width="50" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                     <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_acceuil') }}">
+                            <i class="fas fa-hotel me-1"></i> home
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#">Hébergement</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Espace de coworking</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Événements</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Avis et réclamation</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_reservation_index') }}">
+                            <i class="fas fa-calendar-check me-1"></i> Mes Réservations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_hotel_index') }}">
+                            <i class="fas fa-hotel me-1"></i> Hotels
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_assurance_index') }}">
+                            <i class="fas fa-shield-alt me-1"></i> Mes Assurances
+                        </a>
+                    </li>
+                </ul>
+
+                
+            </div>
+        </div>
+    </nav>
+</header>
 <div class="container-fluid py-4">
     <div class="row mb-4">
         <div class="col-12">
@@ -111,4 +153,64 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Carrousel des destinations
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.destinations-track');
+            const prevBtn = document.querySelector('.prev-dest');
+            const nextBtn = document.querySelector('.next-dest');
+            const cards = document.querySelectorAll('.destination-card');
+            
+            if (cards.length > 0) {
+                const cardStyle = window.getComputedStyle(cards[0]);
+                const cardMarginRight = parseFloat(cardStyle.marginRight);
+                const cardWidth = cards[0].offsetWidth + cardMarginRight;
+                const visibleCards = Math.floor(document.querySelector('.destinations-carousel').offsetWidth / cardWidth);
+                let currentPosition = 0;
+                const maxPosition = -(cards.length - visibleCards) * cardWidth;
+
+                nextBtn.addEventListener('click', () => {
+                    currentPosition = Math.max(currentPosition - (visibleCards * cardWidth), maxPosition);
+                    track.style.transform = `translateX(${currentPosition}px)`;
+                    updateArrows();
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    currentPosition = Math.min(currentPosition + (visibleCards * cardWidth), 0);
+                    track.style.transform = `translateX(${currentPosition}px)`;
+                    updateArrows();
+                });
+
+                function updateArrows() {
+                    prevBtn.style.visibility = currentPosition === 0 ? 'hidden' : 'visible';
+                    nextBtn.style.visibility = currentPosition <= maxPosition ? 'hidden' : 'visible';
+                }
+
+                // Initial setup
+                updateArrows();
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    const newVisibleCards = Math.floor(document.querySelector('.destinations-carousel').offsetWidth / cardWidth);
+                    const newMaxPosition = -(cards.length - newVisibleCards) * cardWidth;
+                    
+                    if (currentPosition < newMaxPosition) {
+                        currentPosition = newMaxPosition;
+                        track.style.transform = `translateX(${currentPosition}px)`;
+                    }
+                    
+                    updateArrows();
+                });
+            }
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 100);
+            });
+        });
+    </script>
 {% endblock %}

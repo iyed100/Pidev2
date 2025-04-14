@@ -1,0 +1,155 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Admin - Réservation #{{ reservation.id }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-calendar-check text-primary"></i> Détails Réservation #{{ reservation.id }}
+        </h1>
+        <a href="{{ path('app_reservation_index') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Retour à la liste
+        </a>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Informations de la réservation</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                            <a class="dropdown-item" href="{{ path('app_reservation_edit', {'id': reservation.id}) }}">
+                                <i class="fas fa-edit fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Modifier
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal">
+                                <i class="fas fa-trash-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Supprimer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th class="bg-light">ID</th>
+                                        <td>{{ reservation.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Statut</th>
+                                        <td>
+                                            <span class="badge badge-{% if reservation.statut == 'confirmé' %}success{% elseif reservation.statut == 'annulé' %}danger{% else %}warning{% endif %}">
+                                                {{ reservation.statut }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Type de service</th>
+                                        <td>
+                                            <span class="badge badge-info">
+                                                {{ reservation.typeservice }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Nuits</th>
+                                        <td>{{ reservation.nbrnuit }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="bg-light">Heures</th>
+                                        <td>{{ reservation.nbrheure }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th class="bg-light">Client</th>
+                                        <td>
+                                            {% if reservation.utilisateur %}
+                                                {{ reservation.utilisateur.nom }} {{ reservation.utilisateur.prenom }}
+                                                <br>
+                                                <small class="text-muted">{{ reservation.utilisateur.email }}</small>
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    
+                                    {% if reservation.hotel %}
+                                    <tr>
+                                        <th class="bg-light">Hôtel</th>
+                                        <td>{{ reservation.hotel.nom }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if reservation.coworkingSpace %}
+                                    <tr>
+                                        <th class="bg-light">Espace coworking</th>
+                                        <td>{{ reservation.coworkingSpace.nom }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if reservation.transportMean %}
+                                    <tr>
+                                        <th class="bg-light">Transport</th>
+                                        <td>{{ reservation.transportMean.nom }} ({{ reservation.transportMean.type }})</td>
+                                    </tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal-->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirmer la suppression</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Êtes-vous sûr de vouloir supprimer cette réservation?</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
+                    <button class="btn btn-danger" type="submit">
+                        <i class="fas fa-trash-alt"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Scripts spécifiques à la page admin
+    </script>
+{% endblock %}

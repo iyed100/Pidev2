@@ -28,15 +28,29 @@ final class AssuranceController extends AbstractController
         if (!$userId) {
             return $this->redirectToRoute('app_login');
         }
-
+    
         $user = $userRepo->find($userId);
         if (!$user) {
             $session->clear();
             return $this->redirectToRoute('app_login');
         }
-
-        $assurances = $assuranceRepository->findByUser($user);
-
+    
+        // Si l'utilisateur est admin, on récupère toutes les assurances
+        if ($user->getRole() === 'admin') {
+            $assurances = $assuranceRepository->findAll();
+        } else {
+            // Sinon, on récupère seulement les assurances de l'utilisateur
+            $assurances = $assuranceRepository->findByUser($user);
+        }
+    
+        // Vérifier si l'utilisateur a le rôle admin pour choisir le template
+        if ($user->getRole() === 'admin') {
+            return $this->render('admin/assurances/index.html.twig', [
+                'assurances' => $assurances,
+            ]);
+        }
+    
+        // Pour les utilisateurs normaux
         return $this->render('assurance/index.html.twig', [
             'assurances' => $assurances,
         ]);
@@ -92,12 +106,25 @@ final class AssuranceController extends AbstractController
         if (!$userId) {
             return $this->redirectToRoute('app_login');
         }
-
+    
         $user = $userRepo->find($userId);
-        if (!$user || !$assurance->getReservation() || $assurance->getReservation()->getUtilisateur() !== $user) {
+        if (!$user) {
+            $session->clear();
+            return $this->redirectToRoute('app_login');
+        }
+    
+        // Vérifier si l'utilisateur a le rôle admin pour choisir le template
+        if ($user->getRole() === 'admin') {
+            return $this->render('admin/assurances/show.html.twig', [
+                'assurance' => $assurance,
+            ]);
+        }
+    
+        // Vérification des permissions pour les utilisateurs normaux
+        if (!$assurance->getReservation() || $assurance->getReservation()->getUtilisateur() !== $user) {
             throw $this->createAccessDeniedException('Accès non autorisé');
         }
-
+    
         return $this->render('assurance/show.html.twig', [
             'assurance' => $assurance,
         ]);

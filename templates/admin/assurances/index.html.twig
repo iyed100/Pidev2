@@ -1,0 +1,324 @@
+{% extends 'admin/base_admin.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Hero Section */
+        .hero-section {
+            background: url('/images/background.jpg') center/cover no-repeat;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.5) !important;
+            transition: all 0.3s;
+        }
+        
+        .navbar.scrolled {
+            background: rgba(0, 0, 0, 0.9) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar a { 
+            color: white !important; 
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .navbar a:hover {
+            opacity: 0.8;
+        }
+
+        /* Reservation Show Section */
+        .reservation-container {
+            margin-top: 80px;
+            margin-bottom: 40px;
+        }
+        
+        .detail-card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+        
+        .detail-table {
+            margin-bottom: 0;
+        }
+        
+        .detail-table th {
+            width: 40%;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-table td {
+            padding: 1rem;
+            border-top: 1px solid #f1f1f1;
+        }
+        
+        .detail-table tr:first-child td {
+            border-top: none;
+        }
+        
+        .badge-detail {
+            font-size: 0.85em;
+            padding: 0.5em 0.75em;
+            font-weight: 500;
+        }
+        
+        .service-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            border-radius: 50px;
+            background: #f8f9fa;
+            margin-right: 0.5em;
+            margin-bottom: 0.5em;
+        }
+
+        /* Custom Assurance Badges */
+        .assurance-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.85em;
+            color: white;
+        }
+        
+        .assurance-type-auto {
+            background-color: #dc3545;
+        }
+        
+        .assurance-type-sante {
+            background-color: #28a745;
+        }
+        
+        .assurance-type-other {
+            background-color: #6c757d;
+        }
+        
+        .assurance-statut-actif {
+            background-color: #28a745;
+        }
+        
+        .assurance-statut-expire {
+            background-color: #dc3545;
+        }
+        
+        .assurance-statut-other {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .reservation-container {
+                margin-top: 60px;
+            }
+            
+            .card-header-custom {
+                padding: 1rem;
+            }
+            
+            .detail-table th, 
+            .detail-table td {
+                padding: 0.75rem;
+                display: block;
+                width: 100%;
+            }
+            
+            .detail-table tr {
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+        }
+    </style>
+{% endblock %}
+{% block title %}Admin - Gestion des Assurances{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-shield-alt text-primary"></i> Gestion des Assurances
+        </h1>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Liste des assurances</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Type</th>
+                                    <th>Montant</th>
+                                    <th>Dates</th>
+                                    <th>Statut</th>
+                                    <th>Client</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for assurance in assurances %}
+                                <tr>
+                                    <td>#{{ assurance.id }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if assurance.type == 'Auto' %}bg-danger
+                                            {% elseif assurance.type == 'Santé' %}bg-success
+                                            {% else %}bg-secondary
+                                            {% endif %}">
+                                            {{ assurance.type }}
+                                        </span>
+                                    </td>
+                                    <td>{{ assurance.montant }} €</td>
+                                    <td>
+                                        <small class="d-block">
+                                            <strong>Souscr.:</strong> {{ assurance.dateSouscription|date('d/m/Y') }}
+                                        </small>
+                                        <small class="d-block">
+                                            <strong>Expir.:</strong> 
+                                            <span class="{% if assurance.dateExpiration < date() %}text-danger{% endif %}">
+                                                {{ assurance.dateExpiration|date('d/m/Y') }}
+                                            </span>
+                                        </small>
+                                    </td>
+                                    <td>
+                                          <span class="badge 
+                                            {% if assurance.statut == 'Actif' %}bg-success
+                                            {% elseif assurance.statut == 'Expiré' %}bg-danger
+                                            {% else %}bg-secondary
+                                            {% endif %}">
+                                            {{ assurance.statut }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if assurance.reservation and assurance.reservation.utilisateur %}
+                                            {{ assurance.reservation.utilisateur.nom }} {{ assurance.reservation.utilisateur.prenom }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="{{ path('app_assurance_show', {'id': assurance.id}) }}" 
+                                               class="btn btn-sm btn-outline-primary mr-1"
+                                               title="Détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            
+                                            <form method="post" action="{{ path('app_assurance_delete', {'id': assurance.id}) }}" 
+                                                  class="delete-form"
+                                                  onsubmit="return confirm('Supprimer cette assurance ?')">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ assurance.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i> Aucune assurance trouvée.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Carrousel des destinations
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.destinations-track');
+            const prevBtn = document.querySelector('.prev-dest');
+            const nextBtn = document.querySelector('.next-dest');
+            const cards = document.querySelectorAll('.destination-card');
+            
+            if (cards.length > 0) {
+                const cardStyle = window.getComputedStyle(cards[0]);
+                const cardMarginRight = parseFloat(cardStyle.marginRight);
+                const cardWidth = cards[0].offsetWidth + cardMarginRight;
+                const visibleCards = Math.floor(document.querySelector('.destinations-carousel').offsetWidth / cardWidth);
+                let currentPosition = 0;
+                const maxPosition = -(cards.length - visibleCards) * cardWidth;
+
+                nextBtn.addEventListener('click', () => {
+                    currentPosition = Math.max(currentPosition - (visibleCards * cardWidth), maxPosition);
+                    track.style.transform = `translateX(${currentPosition}px)`;
+                    updateArrows();
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    currentPosition = Math.min(currentPosition + (visibleCards * cardWidth), 0);
+                    track.style.transform = `translateX(${currentPosition}px)`;
+                    updateArrows();
+                });
+
+                function updateArrows() {
+                    prevBtn.style.visibility = currentPosition === 0 ? 'hidden' : 'visible';
+                    nextBtn.style.visibility = currentPosition <= maxPosition ? 'hidden' : 'visible';
+                }
+
+                // Initial setup
+                updateArrows();
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    const newVisibleCards = Math.floor(document.querySelector('.destinations-carousel').offsetWidth / cardWidth);
+                    const newMaxPosition = -(cards.length - newVisibleCards) * cardWidth;
+                    
+                    if (currentPosition < newMaxPosition) {
+                        currentPosition = newMaxPosition;
+                        track.style.transform = `translateX(${currentPosition}px)`;
+                    }
+                    
+                    updateArrows();
+                });
+            }
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 100);
+            });
+        });
+    </script>
+{% endblock %}

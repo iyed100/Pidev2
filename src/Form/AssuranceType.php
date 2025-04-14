@@ -21,6 +21,7 @@ class AssuranceType extends AbstractType
         $builder
             ->add('type', ChoiceType::class, [
                 'label' => 'Type d\'assurance',
+                'required' => true,
                 'choices' => [
                     'Annulation' => 'Annulation',
                     'Médicale' => 'Medicale',
@@ -40,6 +41,7 @@ class AssuranceType extends AbstractType
             ])
             ->add('montant', MoneyType::class, [
                 'label' => 'Montant (€)',
+                'required' => true,
                 'currency' => 'EUR',
                 'attr' => [
                     'class' => 'form-control',
@@ -49,6 +51,7 @@ class AssuranceType extends AbstractType
             ])
             ->add('conditions', TextareaType::class, [
                 'label' => 'Conditions incluses',
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'rows' => 5,
@@ -57,6 +60,7 @@ class AssuranceType extends AbstractType
             ])
             ->add('date_souscription', DateType::class, [
                 'label' => 'Date de souscription',
+                'required' => true,
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'form-control datepicker'
@@ -66,6 +70,7 @@ class AssuranceType extends AbstractType
             ])
             ->add('date_expiration', DateType::class, [
                 'label' => 'Date d\'expiration',
+                'required' => true,
                 'widget' => 'single_text',
                 'attr' => [
                     'class' => 'form-control datepicker'
@@ -75,6 +80,7 @@ class AssuranceType extends AbstractType
             ])
             ->add('statut', ChoiceType::class, [
                 'label' => 'Statut',
+                'required' => true,'required' => true,
                 'choices' => [
                     'Actif' => 'Actif',
                     'Inactif' => 'Inactif',
@@ -87,6 +93,7 @@ class AssuranceType extends AbstractType
             ->add('reservation', EntityType::class, [
                 'class' => Reservation::class,
                 'choice_label' => 'id',
+                'required' => true,
                 'attr' => [
                     'class' => 'd-none' // Cache le champ mais le garde dans le formulaire
                 ],
@@ -96,9 +103,10 @@ class AssuranceType extends AbstractType
     }
 
     public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Assurance::class,
-        ]);
-    }
+{
+    $resolver->setDefaults([
+        'data_class' => Assurance::class,
+        'montant_disabled' => false // Nouvelle option
+    ]);
+}
 }
