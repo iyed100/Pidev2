@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                width: 100%;
+                overflow-x: hidden;
+                background-color: #ffffff;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                padding-top: 76px; /* Height of the navbar */
+            }
+
+            .navbar {
+                background: rgba(0, 0, 0, 0.7);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                padding: 1rem 0;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+
+            .navbar-brand, .nav-link {
+                color: white !important;
+            }
+
+            .nav-link:hover {
+                color: #ffd700 !important;
+            }
+
+            .card {
+                transition: transform 0.3s ease;
+                border: none;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                background: white;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .route-card {
+                background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+                color: white;
+            }
+
+            .hotel-card {
+                background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+                color: #333;
+            }
+
+            .transport-card {
+                background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+                color: #333;
+            }
+
+            .coworking-card {
+                background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+                color: #333;
+            }
+
+            .section-header {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                color: #2c3e50;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+
+            .btn-custom {
+                border-radius: 25px;
+                padding: 0.5rem 1.5rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            }
+
+            .btn-custom:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+            .main-content {
+                flex: 1;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                background-color: #ffffff;
+                min-height: calc(100vh - 76px); /* Viewport height minus navbar height */
+            }
+
+            .page-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 2rem;
+                width: 100%;
+            }
+
+            /* Common styles for all sections */
+            .section-card {
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+                overflow: hidden;
+                margin-bottom: 2rem;
+            }
+
+            .section-title {
+                color: #2c3e50;
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #f8f9fa;
+            }
+
+            /* Form styles */
+            .form-control, .form-select {
+                border: 1px solid #e9ecef;
+                border-radius: 8px;
+                padding: 0.75rem 1rem;
+                transition: all 0.3s ease;
+            }
+
+            .form-control:focus, .form-select:focus {
+                border-color: #2575fc;
+                box-shadow: 0 0 0 0.2rem rgba(37, 117, 252, 0.1);
+            }
+
+            /* Table styles */
+            .table-custom {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .table-custom th {
+                background: #f8f9fa;
+                color: #2c3e50;
+                font-weight: 500;
+                padding: 1rem;
+            }
+
+            .table-custom td {
+                padding: 1rem;
+                color: #6c757d;
+                vertical-align: middle;
+            }
+
+            .table-custom tr:not(:last-child) {
+                border-bottom: 1px solid #f8f9fa;
+            }
+
+            /* Action buttons */
+            .btn-action {
+                padding: 0.75rem 1.5rem;
+                border-radius: 25px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .btn-action:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+            .btn-primary-gradient {
+                background: linear-gradient(to right, #6a11cb, #2575fc);
+                border: none;
+                color: white;
+            }
+
+            .btn-secondary-gradient {
+                background: linear-gradient(to right, #f6d365, #fda085);
+                border: none;
+                color: white;
+            }
+
+            .btn-danger-gradient {
+                background: linear-gradient(to right, #ff6b6b, #ee5253);
+                border: none;
+                color: white;
+            }
+        </style>
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        {% if app.request.get('_route') != 'app_login' and app.request.get('_route') != 'app_register' %}
+            <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+                <div class="container">
+                    <a class="navbar-brand" href="{{ path('app_acceuil') }}">TravelFlex</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_route_index') }}">
+                                    <i class="bi bi-map"></i> Routes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_transport_means_index') }}">
+                                    <i class="bi bi-truck"></i> Transport
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_hotel_index') }}">
+                                    <i class="bi bi-building"></i> Hotels
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_coworking_space_index') }}">
+                                    <i class="bi bi-briefcase"></i> Coworking
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_reservation_index') }}">
+                                    <i class="bi bi-calendar-check"></i> Réservation
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_assurance_index') }}">
+                                    <i class="bi bi-shield-check"></i> Assurance
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="navbar-nav">
+                            {% if app.user %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_logout') }}">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_login') }}">
+                                        <i class="bi bi-box-arrow-in-right"></i> Login
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        {% endif %}
+        
+        <div class="main-content">
+            <div class="page-container">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Route{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Create New Route</h1>
+
+        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.depart, 'Departure', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.depart, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.depart) }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.arrivee, 'Arrival', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.arrivee, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.arrivee) }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.distance, 'Distance (km)', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.distance, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.distance) }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.duree, 'Duration (HH:MM)', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.duree, {'attr': {'class': 'form-control', 'placeholder': 'e.g. 02:30'}}) }}
+                    {{ form_errors(form.duree) }}
+                </div>
+
+                <div class="col-12 mb-3">
+                    {{ form_label(form.transport, 'Transport Mean', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.transport, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.transport) }}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="{{ path('app_route_index') }}" class="btn btn-secondary">Back to list</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %} 

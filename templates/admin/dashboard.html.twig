@@ -1,0 +1,105 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block body %}
+<!-- Stats Row -->
+<div class="row mb-4">
+    <!-- Sales Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card-elegent card border-left-primary h-100 py-2">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-xs font-weight-bold text-primary mb-1">Sales</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">$292,000</div>
+                        <small class="text-success">$135 Net revenue</small>
+                    </div>
+                    <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card-elegent card border-left-success h-100 py-2">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-xs font-weight-bold text-success mb-1">Customers</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">$3,200</div>
+                        <small class="text-success">$135 Net revenue</small>
+                    </div>
+                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="card-elegent card mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Top-Selling Products</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Orders</th>
+                        <th>Price</th>
+                        <th>Ads Spent</th>
+                        <th>Refunds</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Nike v22</td>
+                        <td>8000</td>
+                        <td>$100</td>
+                        <td>$8,500</td>
+                        <td><span class="badge bg-danger">$12</span></td>
+                    </tr>
+                    <tr>
+                        <td>Running Stream</td>
+                        <td>3000</td>
+                        <td>$45</td>
+                        <td>$4,500</td>
+                        <td><span class="badge bg-warning">$11</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- New Customers -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card-elegent card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">New Customers</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex align-items-center">
+                        <img src="https://via.placeholder.com/40" class="rounded-circle me-3">
+                        <div>
+                            <h6 class="mb-0">Bootlib Ehrman</h6>
+                            <small class="text-muted">New today</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <img src="https://via.placeholder.com/40" class="rounded-circle me-3">
+                        <div>
+                            <h6 class="mb-0">Jono Smith</h6>
+                            <small class="text-muted">New yesterday</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

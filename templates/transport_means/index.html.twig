@@ -1,0 +1,294 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Transport Means{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .page-header {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .transport-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .transport-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .transport-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .transport-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .transport-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .transport-card .badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .transport-card .btn {
+            border-radius: 25px;
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .transport-card .btn-primary {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            border: none;
+        }
+
+        .transport-card .btn-light {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .transport-card .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .transport-info {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .transport-info i {
+            width: 20px;
+            color: #2575fc;
+        }
+
+        .add-vehicle-btn {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .add-vehicle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+            color: white;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .search-card .form-control,
+        .search-card .form-select {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .search-card .form-control:focus,
+        .search-card .form-select:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 0 0.2rem rgba(37, 117, 252, 0.1);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid px-4">
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2 mb-0">
+                    <i class="bi bi-truck me-2"></i> Transport Fleet Management
+                </h1>
+                <a href="{{ path('app_transport_means_new') }}" class="add-vehicle-btn">
+                    <i class="bi bi-plus-circle me-2"></i> Add New Vehicle
+                </a>
+            </div>
+
+            <div class="search-card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="search" class="form-label">Search</label>
+                                <input type="text" name="search" id="search" class="form-control" 
+                                       placeholder="Search by name" value="{{ searchTerm }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="type" class="form-label">Type</label>
+                                <select name="type" id="type" class="form-select">
+                                    <option value="">All Types</option>
+                                    <option value="bus" {% if type == 'bus' %}selected{% endif %}>Bus</option>
+                                    <option value="train" {% if type == 'train' %}selected{% endif %}>Train</option>
+                                    <option value="metro" {% if type == 'metro' %}selected{% endif %}>Metro</option>
+                                    <option value="taxi" {% if type == 'taxi' %}selected{% endif %}>Taxi</option>
+                                    <option value="bicycle" {% if type == 'bicycle' %}selected{% endif %}>Bicycle</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="minCapacity" class="form-label">Minimum Capacity</label>
+                                <input type="number" name="minCapacity" id="minCapacity" class="form-control" 
+                                       placeholder="Min capacity" value="{{ minCapacity }}" min="1">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="maxPrice" class="form-label">Maximum Price</label>
+                                <input type="number" name="maxPrice" id="maxPrice" class="form-control" 
+                                       placeholder="Max price" value="{{ maxPrice }}" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary-gradient btn-action">
+                                <i class="bi bi-search me-1"></i> Search
+                            </button>
+                            {% if searchTerm or type or minCapacity or maxPrice %}
+                                <a href="{{ path('app_transport_means_index') }}" class="btn btn-light btn-action">
+                                    <i class="bi bi-x-circle me-1"></i> Clear Filters
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for transport in transport_means %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="transport-card card h-100">
+                        {% if transport.image %}
+                            <div class="overflow-hidden">
+                                <img src="{{ asset('uploads/transport_means/' ~ transport.image) }}" 
+                                     class="card-img-top" alt="{{ transport.nom }}">
+                            </div>
+                        {% else %}
+                            <div class="card-img-top d-flex align-items-center justify-content-center bg-light" 
+                                 style="height: 200px;">
+                                <i class="bi bi-truck" style="font-size: 4rem; color: #ccc;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">{{ transport.nom }}</h5>
+                                <span class="badge">
+                                    <i class="bi bi-{{ transport.type == 'bus' ? 'bus-front' : 
+                                                    (transport.type == 'train' ? 'train-front' : 
+                                                    (transport.type == 'metro' ? 'train' : 
+                                                    (transport.type == 'taxi' ? 'taxi-front' : 'bicycle'))) }} me-1"></i>
+                                    {{ transport.type|capitalize }}
+                                </span>
+                            </div>
+                            <div class="transport-info mb-4">
+                                <p class="mb-2">
+                                    <i class="bi bi-people-fill me-2"></i>
+                                    {{ transport.capacite }} passengers
+                                </p>
+                                <p class="mb-2">
+                                    <i class="bi bi-currency-euro me-2"></i>
+                                    {{ transport.prix|number_format(2, '.', ',') }} €
+                                </p>
+                                <p class="mb-2">
+                                    <i class="bi bi-calendar-event me-2"></i>
+                                    {{ transport.dateDepart is null ? 'No date set' : transport.dateDepart|date('d/m/Y') }}
+                                </p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{{ path('app_transport_means_show', {'id': transport.id}) }}" 
+                                   class="btn btn-primary-gradient btn-action flex-grow-1">
+                                    <i class="bi bi-eye me-1"></i> View
+                                </a>
+                                <a href="{{ path('app_transport_means_edit', {'id': transport.id}) }}" 
+                                   class="btn btn-secondary-gradient btn-action">
+                                    <i class="bi bi-pencil me-1"></i> Edit
+                                </a>
+                                <form method="post" action="{{ path('app_transport_means_delete', {'id': transport.id}) }}" 
+                                      class="d-inline" onsubmit="return confirm('Are you sure you want to delete this vehicle?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ transport.id) }}">
+                                    <button class="btn btn-danger-gradient btn-action">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info section-card">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <span>
+                                {% if searchTerm or type or minCapacity or maxPrice %}
+                                    No vehicles found matching your search criteria. Try adjusting your filters.
+                                {% else %}
+                                    No vehicles found. Start by adding your first vehicle!
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if app.session.flashBag.has('success') %}
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            {% for message in app.flashes('success') %}
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        <strong class="me-auto">Success</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Auto-hide toasts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            let toasts = document.querySelectorAll('.toast');
+            toasts.forEach(function(toast) {
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                }, 5000);
+            });
+        });
+    </script>
+{% endblock %} 

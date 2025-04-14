@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Assurances{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Gestion des Assurances
+                    </h1>
+                    <a href="{{ path('app_assurance_new') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-1"></i> Nouvelle Assurance
+                    </a>
+                    
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Type</th>
+                                    <th>Montant</th>
+                                    <th>Dates</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for assurance in assurances %}
+                                <tr>
+                                    <td class="fw-bold">#{{ assurance.id }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if assurance.type == 'Auto' %}bg-danger
+                                            {% elseif assurance.type == 'Santé' %}bg-success
+                                            {% else %}bg-secondary
+                                            {% endif %}">
+                                            {{ assurance.type }}
+                                        </span>
+                                    </td>
+                                    <td>{{ assurance.montant }} €</td>
+                                    <td>
+                                        <small class="d-block">
+                                            <strong>Souscr.:</strong> {{ assurance.dateSouscription|date('d/m/Y') }}
+                                        </small>
+                                        <small class="d-block">
+                                            <strong>Expir.:</strong> 
+                                            <span class="{% if assurance.dateExpiration < date() %}text-danger{% endif %}">
+                                                {{ assurance.dateExpiration|date('d/m/Y') }}
+                                            </span>
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if assurance.statut == 'Actif' %}bg-success
+                                            {% elseif assurance.statut == 'Expiré' %}bg-danger
+                                            {% else %}bg-secondary
+                                            {% endif %}">
+                                            {{ assurance.statut }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="{{ path('app_assurance_show', {'id': assurance.id}) }}" 
+                                               class="btn btn-sm btn-outline-primary me-1"
+                                               title="Détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ path('app_assurance_edit', {'id': assurance.id}) }}" 
+                                               class="btn btn-sm btn-outline-warning me-1"
+                                               title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_assurance_delete', {'id': assurance.id}) }}" 
+                                                  class="delete-form"
+                                                  onsubmit="return confirm('Supprimer cette assurance ?')">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ assurance.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i> Aucune assurance trouvée.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<style>
+    .card {
+        border-radius: 10px;
+    }
+    .badge {
+        font-size: 0.85em;
+        padding: 0.4em 0.65em;
+    }
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    @media (max-width: 768px) {
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Confirmation avant suppression
+document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        if(!confirm('Êtes-vous sûr de vouloir supprimer cette assurance ?')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

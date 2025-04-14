@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Assurance{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <h1 class="mb-4 text-center">Nouvelle Assurance</h1>
+
+    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+    <div class="row">
+        <!-- Colonne Type et Conditions -->
+        <div class="col-md-6">
+            <!-- Type d'assurance -->
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Type d'assurance</h2>
+                </div>
+                <div class="card-body">
+                    {{ form_widget(form.type, {
+                        'attr': {
+                            'class': 'form-select',
+                            'required': 'required'
+                        }
+                    }) }}
+                </div>
+            </div>
+
+            <!-- Conditions -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h5 mb-0">Conditions incluses</h2>
+                </div>
+                <div class="card-body">
+                    {{ form_widget(form.conditions, {
+                        'attr': {
+                            'class': 'form-select',
+                            'size': '8',
+                            'required': 'required'
+                        }
+                    }) }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne Dates et Actions -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow">
+                <div class="card-body d-flex flex-column">
+                    <!-- Dates -->
+                    <div class="mb-4">
+                        <label class="form-label">Date de souscription</label>
+                        {{ form_widget(form.date_souscription, {
+                            'attr': {
+                                'class': 'form-control datepicker',
+                                'placeholder': 'jj/mm/aaaa',
+                                'required': 'required'
+                            }
+                        }) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Date d'expiration</label>
+                        {{ form_widget(form.date_expiration, {
+                            'attr': {
+                                'class': 'form-control datepicker',
+                                'placeholder': 'jj/mm/aaaa',
+                                'required': 'required'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Statut -->
+                    <div class="mb-4">
+                        <label class="form-label">Statut</label>
+                        {{ form_widget(form.statut, {
+                            'attr': {
+                                'class': 'form-select',
+                                'required': 'required'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Montant -->
+                    <div class="mb-4">
+                        <label class="form-label">Montant (€)</label>
+                        {{ form_widget(form.montant, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': '0.00',
+                                'step': '0.01',
+                                'min': '0',
+                                'required': 'required'
+                            }
+                        }) }}
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="mt-auto d-flex justify-content-between">
+                        <a href="{{ path('app_assurance_index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour
+                        </a>
+                        <div>
+                            <button type="reset" class="btn btn-outline-danger me-2">
+                                <i class="fas fa-undo me-1"></i> Réinitialiser
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .card {
+        border-radius: 8px;
+        border: none;
+    }
+    .card-header {
+        font-weight: 600;
+    }
+    .form-select[multiple] {
+        height: auto;
+        min-height: 150px;
+    }
+    .datepicker {
+        background-color: white;
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation des datepickers
+    flatpickr('.datepicker', {
+        dateFormat: "d/m/Y",
+        locale: "fr",
+        allowInput: true
+    });
+
+    // Validation du formulaire
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    }, false);
+});
+</script>
+{% endblock %}

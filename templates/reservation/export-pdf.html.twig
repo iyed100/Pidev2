@@ -1,0 +1,57 @@
+{# templates/reservation/export-pdf.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Export Réservations</title>
+    <style>
+        body { font-family: Arial; margin: 0; padding: 20px; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #3498db; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px; border: 1px solid #ddd; }
+        .text-center { text-align: center; }
+        .no-data { color: #999; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>Liste des Réservations</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Hôtel</th>
+                <th>Espace</th>
+                <th>Transport</th>
+                <th>Nuits</th>
+                <th>Heures</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reservation in reservations %}
+            <tr>
+                <td class="text-center">{{ reservation.id }}</td>
+                <td>{{ reservation.typeservice ?? 'N/A' }}</td>
+                <td>{{ reservation.hotel.nom ?? 'N/A' }}</td>
+                <td>{{ reservation.coworkingSpace.nom ?? 'N/A' }}</td>
+                <td>{{ reservation.transportMean.type ?? 'N/A' }}</td>
+                <td class="text-center">{{ reservation.nbrnuit }}</td>
+                <td class="text-center">{{ reservation.nbrheure }}</td>
+                <td>{{ reservation.statut ?? 'N/A' }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="no-data">Aucune réservation trouvée</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    
+    <div style="margin-top: 40px; text-align: right; font-size: 0.8em;">
+        Généré le {{ "now"|date("d/m/Y à H:i") }}
+    </div>
+</body>
+</html>
