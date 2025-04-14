@@ -157,7 +157,8 @@ class AcceuilController extends AbstractController
 
             $this->addFlash('success', 'Registration successful! You can now login.');
 
-            //return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_login');
+
         }
 
         return $this->render('acceuil/signup.html.twig', [
@@ -208,8 +209,8 @@ class AcceuilController extends AbstractController
 
 
     #[Route('/update-user', name: 'app_update_user', methods: ['POST'])]
-    public function updateUser(Request $request, SessionInterface $session, UtilisateurRepository $userRepository, EntityManagerInterface $em, ValidatorInterface $validator): Response
-    {
+public function updateUser(Request $request, SessionInterface $session, UtilisateurRepository $userRepository, EntityManagerInterface $em, ValidatorInterface $validator): Response
+{
         $user = $userRepository->find($session->get('user_id'));
 
         // Mise à jour des valeurs
@@ -350,4 +351,17 @@ class AcceuilController extends AbstractController
         $session->clear(); // Déconnexion
         return $this->redirectToRoute('app_login');
     }
+    #[Route('/mon-compte', name: 'app_mon_compte')]
+public function monCompte(SessionInterface $session, UtilisateurRepository $userRepository): Response
+{
+    if (!$session->has('user_id')) {
+        return $this->redirectToRoute('app_login');
+    }
+
+    $user = $userRepository->find($session->get('user_id'));
+
+    return $this->render('acceuil/mon_compte.html.twig', [
+        'user' => $user
+    ]);
+}
 }
