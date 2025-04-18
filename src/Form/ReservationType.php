@@ -56,6 +56,7 @@ class ReservationType extends AbstractType
             'attr' => ['class' => 'form-select'],
             'disabled' => $options['preselected_service'] !== null
         ]);
+       
 
     // Champ Hôtel seulement si nécessaire
     if ($options['preselected_service'] !== 'Coworking') {

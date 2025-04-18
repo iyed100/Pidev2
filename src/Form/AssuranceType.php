@@ -10,9 +10,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class AssuranceType extends AbstractType
 {
@@ -21,7 +22,6 @@ class AssuranceType extends AbstractType
         $builder
             ->add('type', ChoiceType::class, [
                 'label' => 'Type d\'assurance',
-                'required' => true,
                 'choices' => [
                     'Annulation' => 'Annulation',
                     'Médicale' => 'Medicale',
@@ -34,79 +34,74 @@ class AssuranceType extends AbstractType
                     'Accidents personnels' => 'AccidentsPersonnels',
                     'Pertes/Documents' => 'PertesDocuments'
                 ],
-                'attr' => [
-                    'class' => 'form-select'
-                ],
+                'attr' => ['class' => 'form-select'],
                 'placeholder' => 'Sélectionnez un type'
             ])
             ->add('montant', MoneyType::class, [
                 'label' => 'Montant (€)',
-                'required' => true,
                 'currency' => 'EUR',
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => '350.50'
-                ],
+                'attr' => ['class' => 'form-control'],
                 'scale' => 2
             ])
             ->add('conditions', TextareaType::class, [
                 'label' => 'Conditions incluses',
-                'required' => true,
-                'attr' => [
-                    'class' => 'form-control',
-                    'rows' => 5,
-                    'placeholder' => 'Annulation gratuite jusqu\'à 7 jours avant le départ...'
-                ]
+                'attr' => ['class' => 'form-control', 'rows' => 5]
             ])
             ->add('date_souscription', DateType::class, [
                 'label' => 'Date de souscription',
-                'required' => true,
                 'widget' => 'single_text',
-                'attr' => [
-                    'class' => 'form-control datepicker'
-                ],
+                'attr' => ['class' => 'form-control datepicker'],
                 'html5' => false,
                 'format' => 'dd/MM/yyyy'
             ])
             ->add('date_expiration', DateType::class, [
                 'label' => 'Date d\'expiration',
-                'required' => true,
                 'widget' => 'single_text',
-                'attr' => [
-                    'class' => 'form-control datepicker'
-                ],
+                'attr' => ['class' => 'form-control datepicker'],
                 'html5' => false,
-                'format' => 'dd/MM/yyyy'
+                'format' => 'dd/MM/yyyy',
+                'constraints' => [
+                    new Callback([$this, 'validateDates'])
+                ]
             ])
             ->add('statut', ChoiceType::class, [
                 'label' => 'Statut',
-                'required' => true,'required' => true,
                 'choices' => [
                     'Actif' => 'Actif',
                     'Inactif' => 'Inactif',
                     'En attente' => 'En attente'
                 ],
-                'attr' => [
-                    'class' => 'form-select'
-                ]
+                'attr' => ['class' => 'form-select']
             ])
             ->add('reservation', EntityType::class, [
                 'class' => Reservation::class,
                 'choice_label' => 'id',
-                'required' => true,
-                'attr' => [
-                    'class' => 'd-none' // Cache le champ mais le garde dans le formulaire
-                ],
+                'attr' => ['class' => 'd-none'],
                 'label' => false
             ]);
-        ;
+    }
+
+    public function validateDates($value, ExecutionContextInterface $context)
+    {
+        $form = $context->getRoot();
+        $data = $form->getData();
+        
+        if (!($data instanceof Assurance)) {
+            return;
+        }
+
+        if ($data->getDateSouscription() && $data->getDateExpiration() 
+            && $data->getDateExpiration() <= $data->getDateSouscription()) {
+            $context->buildViolation('La date d\'expiration doit être postérieure à la date de souscription')
+                    ->atPath('date_expiration')
+                    ->addViolation();
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
-{
-    $resolver->setDefaults([
-        'data_class' => Assurance::class,
-        'montant_disabled' => false // Nouvelle option
-    ]);
-}
+    {
+        $resolver->setDefaults([
+            'data_class' => Assurance::class,
+        ]);
+    }
 }

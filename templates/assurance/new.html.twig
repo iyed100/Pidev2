@@ -1,6 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle Assurance{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
 <div class="container py-5">
@@ -8,24 +24,110 @@
         <div class="col-lg-8">
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h1 class="h3 mb-0">
-                            <i class="fas fa-plus-circle me-2"></i>Nouvelle Assurance
-                        </h1>
-                        <a href="{{ path('app_assurance_index') }}" class="btn btn-sm btn-light">
-                            <i class="fas fa-arrow-left me-1"></i> Retour
-                        </a>
-                    </div>
+                    <h1 class="h3 mb-0">Nouvelle Assurance</h1>
                 </div>
                 
                 <div class="card-body">
-                    {{ form_start(form) }}
-                        {% if app.request.query.get('reservation_id') %}
-                            {# Si un ID de réservation est passé dans l'URL, on le pré-remplit #}
-                            <input type="hidden" name="{{ form.reservation.vars.full_name }}" 
-                                   value="{{ app.request.query.get('reservation_id') }}">
+                    {# Affichage des erreurs globales #}
+                    {% for flashError in app.flashes('error') %}
+                        <div class="alert alert-danger mb-4">
+                            {{ flashError }}
+                        </div>
+                    {% endfor %}
+
+                    {{ form_start(form, {'attr': {'id': 'assurance-form', 'novalidate': 'novalidate'}}) }}
+                        {# Type d'assurance #}
+                        <div class="mb-3">
+                            {{ form_label(form.type, 'Type d\'assurance', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.type, {'attr': {'class': 'form-control' ~ (form.type.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            {% if form.type.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.type.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Montant #}
+                        <div class="mb-3">
+                            {{ form_label(form.montant, 'Montant (€)', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.montant, {'attr': {'class': 'form-control' ~ (form.montant.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            {% if form.montant.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.montant.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Conditions #}
+                        <div class="mb-3">
+                            {{ form_label(form.conditions, 'Conditions', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.conditions, {'attr': {'class': 'form-control' ~ (form.conditions.vars.errors|length ? ' is-invalid' : ''), 'rows': 5}}) }}
+                            {% if form.conditions.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.conditions.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Date de souscription #}
+                        <div class="mb-3">
+                            {{ form_label(form.date_souscription, 'Date de souscription', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.date_souscription, {'attr': {
+                                'class': 'form-control' ~ (form.date_souscription.vars.errors|length ? ' is-invalid' : ''),
+                                'data-date-validator': 'start'
+                            }}) }}
+                            {% if form.date_souscription.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.date_souscription.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Date d'expiration #}
+                        <div class="mb-3">
+                            {{ form_label(form.date_expiration, 'Date d\'expiration', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.date_expiration, {'attr': {
+                                'class': 'form-control' ~ (form.date_expiration.vars.errors|length ? ' is-invalid' : ''),
+                                'data-date-validator': 'end'
+                            }}) }}
+                            <div id="dateExpirationError" class="error-message" style="display: none;">
+                                La date d'expiration doit être postérieure à la date de souscription
+                            </div>
+                            {% if form.date_expiration.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.date_expiration.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Statut #}
+                        <div class="mb-3">
+                            {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'required-field'}}) }}
+                            {{ form_widget(form.statut, {'attr': {'class': 'form-control' ~ (form.statut.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            {% if form.statut.vars.errors %}
+                                <div class="error-message">
+                                    {% for error in form.statut.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {# Champ réservation caché #}
+                        {% if form.reservation is defined %}
+                            {{ form_widget(form.reservation) }}
                         {% endif %}
-                        {{ form_rest(form) }}
+
                         <button type="submit" class="btn btn-primary mt-3">
                             <i class="fas fa-save me-1"></i> Enregistrer
                         </button>
@@ -35,4 +137,92 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('assurance-form');
+        const dateSouscription = form.querySelector('[name$="[date_souscription]"]');
+        const dateExpiration = form.querySelector('[name$="[date_expiration]"]');
+        const dateExpirationError = document.getElementById('dateExpirationError');
+        
+        // Fonction de validation des dates
+        function validateDates() {
+            if (dateSouscription.value && dateExpiration.value) {
+                // Convertir les dates au format YYYY-MM-DD pour la comparaison
+                const souscriptionParts = dateSouscription.value.split('/');
+                const expirationParts = dateExpiration.value.split('/');
+                
+                const souscriptionDate = new Date(`${souscriptionParts[2]}-${souscriptionParts[1]}-${souscriptionParts[0]}`);
+                const expirationDate = new Date(`${expirationParts[2]}-${expirationParts[1]}-${expirationParts[0]}`);
+                
+                if (expirationDate <= souscriptionDate) {
+                    dateExpiration.classList.add('is-invalid');
+                    dateExpirationError.style.display = 'block';
+                    return false;
+                } else {
+                    dateExpiration.classList.remove('is-invalid');
+                    dateExpirationError.style.display = 'none';
+                    return true;
+                }
+            }
+            return true;
+        }
+        
+        // Validation lors du changement de date
+        dateSouscription.addEventListener('change', validateDates);
+        dateExpiration.addEventListener('change', validateDates);
+        
+        // Validation avant soumission
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validation standard des champs requis
+            const requiredFields = form.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    field.classList.add('is-invalid');
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message';
+                    errorDiv.textContent = 'Ce champ est obligatoire';
+                    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                    isValid = false;
+                }
+            });
+            
+            // Validation spécifique des dates
+            if (!validateDates()) {
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                // Scroll vers la première erreur
+                const firstError = form.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+        
+        // Validation en temps réel
+        const fields = ['type', 'montant', 'conditions', 'date_souscription', 'date_expiration', 'statut'];
+        fields.forEach(fieldName => {
+            const field = form.querySelector(`[name$="[${fieldName}]"]`);
+            if (field) {
+                field.addEventListener('input', function() {
+                    if (this.value) {
+                        this.classList.remove('is-invalid');
+                        const errorDiv = this.nextElementSibling;
+                        if (errorDiv && errorDiv.classList.contains('error-message')) {
+                            errorDiv.remove();
+                        }
+                    }
+                });
+            }
+        });
+    });
+    </script>
 {% endblock %}

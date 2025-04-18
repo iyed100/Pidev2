@@ -111,7 +111,7 @@
                                         </span>
                                     </td>
                                     {# Afficher les actions seulement si l'utilisateur n'est pas un client #}
-                                    {% if app.user and app.user.role != 'client' %}
+                                    
                                         <td>
                                             <div class="d-flex">
                                                 <a href="{{ path('app_assurance_show', {'id': assurance.id}) }}" 
@@ -134,7 +134,7 @@
                                                 </form>
                                             </div>
                                         </td>
-                                    {% endif %}
+                                
                                 </tr>
                             {% else %}
                                 <tr>
@@ -147,6 +147,30 @@
                             {% endfor %}
                             </tbody>
                         </table>
+                        {# Pagination #}
+<div class="d-flex justify-content-center mt-3">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item {{ assurances.currentPageNumber == 1 ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ path('app_assurance_index', {page: assurances.currentPageNumber - 1}) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            
+            {% for page in 1..assurances.pageCount %}
+                <li class="page-item {{ page == assurances.currentPageNumber ? 'active' : '' }}">
+                    <a class="page-link" href="{{ path('app_assurance_index', {page: page}) }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+            
+            <li class="page-item {{ assurances.currentPageNumber == assurances.pageCount ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ path('app_assurance_index', {page: assurances.currentPageNumber + 1}) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
                     </div>
                 </div>
             </div>

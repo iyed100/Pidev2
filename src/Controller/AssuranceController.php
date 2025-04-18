@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-
+use Knp\Component\Pager\PaginatorInterface;
 use App\Entity\Assurance;
 use App\Entity\Reservation;
 use App\Form\AssuranceType;
@@ -18,83 +18,141 @@ use App\Repository\UtilisateurRepository;
 #[Route('/assurance')]
 final class AssuranceController extends AbstractController
 {
-    #[Route(name: 'app_assurance_index', methods: ['GET'])]
+    #[Route('/', name: 'app_assurance_index', methods: ['GET'])]
     public function index(
         AssuranceRepository $assuranceRepository,
         SessionInterface $session,
-        UtilisateurRepository $userRepo
+        UtilisateurRepository $userRepo,
+        Request $request,
+        PaginatorInterface $paginator
     ): Response {
         $userId = $session->get('user_id');
         if (!$userId) {
             return $this->redirectToRoute('app_login');
         }
-    
+
         $user = $userRepo->find($userId);
         if (!$user) {
             $session->clear();
             return $this->redirectToRoute('app_login');
         }
-    
-        // Si l'utilisateur est admin, on récupère toutes les assurances
-        if ($user->getRole() === 'admin') {
-            $assurances = $assuranceRepository->findAll();
-        } else {
-            // Sinon, on récupère seulement les assurances de l'utilisateur
-            $assurances = $assuranceRepository->findByUser($user);
+
+        // Construction de la requête de base avec jointures
+        $queryBuilder = $assuranceRepository->createQueryBuilder('a')
+            ->leftJoin('a.reservation', 'r')
+            ->leftJoin('r.utilisateur', 'u');
+
+        // Gestion du tri
+        $sort = $request->query->get('sort', 'a.id');
+        $direction = $request->query->get('direction', 'asc');
+
+        // Validation des champs de tri autorisés
+        $allowedSorts = [
+            'a.id', 
+            'a.type', 
+            'a.montant', 
+            'a.date_souscription',  // Changé de dateSouscription à date_souscription
+            'a.date_expiration',     // Changé de dateExpiration à date_expiration
+            'a.statut', 
+            'u.nom'
+        ];
+        
+        if (in_array($sort, $allowedSorts)) {
+            $queryBuilder->orderBy($sort, $direction);
         }
-    
-        // Vérifier si l'utilisateur a le rôle admin pour choisir le template
+
+        // Filtres
+        $filters = $request->query->all();
+        
+        // Filtre par type
+        if (isset($filters['type']) && $filters['type'] !== '') {
+            $queryBuilder->andWhere('a.type = :type')
+                        ->setParameter('type', $filters['type']);
+        }
+        
+        // Filtre par statut
+        if (isset($filters['statut']) && $filters['statut'] !== '') {
+            $queryBuilder->andWhere('a.statut = :statut')
+                        ->setParameter('statut', $filters['statut']);
+        }
+        
+        // Filtre par date minimum (corrigé pour utiliser date_expiration)
+        if (isset($filters['date_min']) && $filters['date_min'] !== '') {
+            $queryBuilder->andWhere('a.date_expiration >= :dateMin')  // Changé ici
+                        ->setParameter('dateMin', new \DateTime($filters['date_min']));
+        }
+
+        // Filtre par utilisateur si non admin
+        if ($user->getRole() !== 'admin') {
+            $queryBuilder->andWhere('r.utilisateur = :user')
+                        ->setParameter('user', $user);
+        }
+
+        // Pagination
+        $assurances = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1),
+            5
+        );
+
+        // Rendu pour admin
         if ($user->getRole() === 'admin') {
             return $this->render('admin/assurances/index.html.twig', [
                 'assurances' => $assurances,
+                'current_filters' => $filters,
+                'current_sort' => $sort,
+                'current_direction' => $direction
             ]);
         }
-    
-        // Pour les utilisateurs normaux
+
+        // Rendu pour utilisateur normal
         return $this->render('assurance/index.html.twig', [
             'assurances' => $assurances,
+            'current_filters' => $filters,
+            'current_sort' => $sort,
+            'current_direction' => $direction
         ]);
+    }
+    #[Route('/new', name: 'app_assurance_new', methods: ['GET', 'POST'])]
+public function new(
+    Request $request, 
+    EntityManagerInterface $entityManager,
+    ReservationRepository $reservationRepo
+): Response {
+    $assurance = new Assurance();
+    
+    // Si un ID de réservation est passé dans l'URL
+    $reservationId = $request->query->get('reservation_id');
+    if ($reservationId) {
+        $reservation = $reservationRepo->find($reservationId);
+        
+        if ($reservation) {
+            $assurance->setReservation($reservation);
+        } else {
+            $this->addFlash('error', 'La réservation spécifiée n\'existe pas');
+            return $this->redirectToRoute('app_assurance_new');
+        }
     }
 
-    #[Route('/new', name: 'app_assurance_new', methods: ['GET', 'POST'])]
-    public function new(
-        Request $request, 
-        EntityManagerInterface $entityManager,
-        ReservationRepository $reservationRepo
-    ): Response {
-        $assurance = new Assurance();
-        
-        // Si un ID de réservation est passé dans l'URL
-        $reservationId = $request->query->get('reservation_id');
-        if ($reservationId) {
-            $reservation = $reservationRepo->find($reservationId);
-            
-            if ($reservation) {
-                $assurance->setReservation($reservation);
-            } else {
-                $this->addFlash('error', 'La réservation spécifiée n\'existe pas');
-                return $this->redirectToRoute('app_assurance_new');
-            }
+    $form = $this->createForm(AssuranceType::class, $assurance);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            $entityManager->persist($assurance);
+            $entityManager->flush();
+            $this->addFlash('success', 'Assurance créée avec succès');
+            return $this->redirectToRoute('app_assurance_index');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la création de l\'assurance');
         }
-    
-        $form = $this->createForm(AssuranceType::class, $assurance);
-        $form->handleRequest($request);
-    
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $entityManager->persist($assurance);
-                $entityManager->flush();
-                $this->addFlash('success', 'Assurance créée avec succès');
-                return $this->redirectToRoute('app_assurance_index');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de la création de l\'assurance');
-            }
-        }
-    
-        return $this->render('assurance/new.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
+
+    return $this->render('assurance/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
 
     #[Route('/{id}', name: 'app_assurance_show', methods: ['GET'])]
     public function show(
@@ -163,28 +221,40 @@ final class AssuranceController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_assurance_delete', methods: ['POST'])]
-    public function delete(
-        Request $request, 
-        Assurance $assurance, 
-        EntityManagerInterface $entityManager,
-        SessionInterface $session,
-        UtilisateurRepository $userRepo
-    ): Response {
-        $userId = $session->get('user_id');
-        if (!$userId) {
-            return $this->redirectToRoute('app_login');
-        }
+public function delete(
+    Request $request, 
+    Assurance $assurance, 
+    EntityManagerInterface $entityManager,
+    SessionInterface $session,
+    UtilisateurRepository $userRepo
+): Response {
+    $userId = $session->get('user_id');
+    if (!$userId) {
+        return $this->redirectToRoute('app_login');
+    }
 
-        $user = $userRepo->find($userId);
-        if (!$user || !$assurance->getReservation() || $assurance->getReservation()->getUtilisateur() !== $user) {
+    $user = $userRepo->find($userId);
+    if (!$user) {
+        $session->clear();
+        return $this->redirectToRoute('app_login');
+    }
+
+    // Vérification des permissions
+    if ($user->getRole() !== 'admin') {
+        // Pour les utilisateurs normaux, vérifier qu'ils sont bien propriétaires de l'assurance
+        if (!$assurance->getReservation() || $assurance->getReservation()->getUtilisateur() !== $user) {
             throw $this->createAccessDeniedException('Accès non autorisé');
         }
-
-        if ($this->isCsrfTokenValid('delete'.$assurance->getId(), $request->getPayload()->get('_token'))) {
-            $entityManager->remove($assurance);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_assurance_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    if ($this->isCsrfTokenValid('delete'.$assurance->getId(), $request->getPayload()->get('_token'))) {
+        $entityManager->remove($assurance);
+        $entityManager->flush();
+        $this->addFlash('success', 'Assurance supprimée avec succès');
+    } else {
+        $this->addFlash('error', 'Token CSRF invalide');
+    }
+
+    return $this->redirectToRoute('app_assurance_index', [], Response::HTTP_SEE_OTHER);
+}
 }

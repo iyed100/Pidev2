@@ -50,7 +50,7 @@
                                     <tr>
                                         <th class="bg-light">Statut</th>
                                         <td>
-                                            <span class="badge badge-{% if assurance.statut == 'Actif' %}success{% elseif assurance.statut == 'Expiré' %}danger{% else %}warning{% endif %}">
+                                            <span  badge-{% if assurance.statut == 'Actif' %}success{% elseif assurance.statut == 'Expiré' %}danger{% else %}warning{% endif %}">
                                                 {{ assurance.statut }}
                                             </span>
                                         </td>
@@ -58,7 +58,7 @@
                                     <tr>
                                         <th class="bg-light">Type</th>
                                         <td>
-                                            <span class="badge badge-{% if assurance.type == 'Auto' %}danger{% elseif assurance.type == 'Santé' %}success{% else %}info{% endif %}">
+                                            <span  badge-{% if assurance.type == 'Auto' %}danger{% elseif assurance.type == 'Santé' %}success{% else %}info{% endif %}">
                                                 {{ assurance.type }}
                                             </span>
                                         </td>

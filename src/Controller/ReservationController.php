@@ -3,7 +3,7 @@
 namespace App\Controller;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Bundle\SecurityBundle\Security;  // Correct import
@@ -29,39 +29,66 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ReservationController extends AbstractController
 {
     #[Route('/', name: 'app_reservation_index', methods: ['GET'])]
-public function index(ReservationRepository $reservationRepository, SessionInterface $session, UtilisateurRepository $userRepo): Response
-{
-    $userId = $session->get('user_id');
-    if (!$userId) {
-        return $this->redirectToRoute('app_login');
-    }
-
-    $user = $userRepo->find($userId);
-    if (!$user) {
-        $session->clear();
-        return $this->redirectToRoute('app_login');
-    }
-
-    // Si l'utilisateur est admin, on récupère toutes les réservations
-    if ($user->getRole() === 'admin') {
-        $reservations = $reservationRepository->findAll();
-    } else {
-        // Sinon, on récupère seulement les réservations de l'utilisateur
-        $reservations = $reservationRepository->findByUser($user);
-    }
-
-    // Vérifier si l'utilisateur a le rôle admin pour choisir le template
-    if ($user->getRole() === 'admin') {
-        return $this->render('admin/reservations/index.html.twig', [
+    public function index(
+        Request $request,
+        ReservationRepository $reservationRepository,
+        SessionInterface $session,
+        UtilisateurRepository $userRepo,
+        PaginatorInterface $paginator
+    ): Response {
+        $userId = $session->get('user_id');
+        if (!$userId) {
+            return $this->redirectToRoute('app_login');
+        }
+    
+        $user = $userRepo->find($userId);
+        if (!$user) {
+            $session->clear();
+            return $this->redirectToRoute('app_login');
+        }
+    
+        // Construction de la requête de base (identique à votre version)
+        $queryBuilder = $reservationRepository->createQueryBuilder('r');
+    
+        // Ajout des filtres (nouveauté)
+        $filters = $request->query->all();
+        
+        if (isset($filters['type_service']) && $filters['type_service'] !== '') {
+            $queryBuilder->andWhere('r.typeservice = :typeService')
+                        ->setParameter('typeService', $filters['type_service']);
+        }
+        
+        if (isset($filters['statut']) && $filters['statut'] !== '') {
+            $queryBuilder->andWhere('r.statut = :statut')
+                        ->setParameter('statut', $filters['statut']);
+        }
+    
+        // Filtre utilisateur (identique à votre version)
+        if ($user->getRole() !== 'admin') {
+            $queryBuilder->andWhere('r.utilisateur = :user')
+                        ->setParameter('user', $user);
+        }
+    
+        // Pagination (identique à votre version)
+        $reservations = $paginator->paginate(
+            $queryBuilder->getQuery(),
+            $request->query->getInt('page', 1),
+            5
+        );
+    
+        // Rendu (identique à votre version)
+        if ($user->getRole() === 'admin') {
+            return $this->render('admin/reservations/index.html.twig', [
+                'reservations' => $reservations,
+                'current_filters' => $filters // Passer les filtres au template
+            ]);
+        }
+    
+        return $this->render('reservation/index.html.twig', [
             'reservations' => $reservations,
+            'current_filters' => $filters // Passer les filtres au template
         ]);
     }
-
-    // Pour les utilisateurs normaux
-    return $this->render('reservation/index.html.twig', [
-        'reservations' => $reservations,
-    ]);
-}
 
 #[Route('/new', name: 'app_reservation_new', methods: ['GET', 'POST'])]
 public function new(

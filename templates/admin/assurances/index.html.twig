@@ -144,6 +144,26 @@
                 display: block;
             }
         }
+         #assuranceSearchInput {
+            border-left: none;
+            padding-left: 0.5rem;
+        }
+        .input-group-text {
+            border-right: none;
+            background-color: white !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .d-sm-flex.align-items-center {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            #assuranceSearchInput {
+                width: 100% !important;
+                margin-top: 0.5rem;
+            }
+        }
     </style>
 {% endblock %}
 {% block title %}Admin - Gestion des Assurances{% endblock %}
@@ -155,6 +175,49 @@
         <h1 class="h3 mb-0 text-gray-800">
             <i class="fas fa-shield-alt text-primary"></i> Gestion des Assurances
         </h1>
+         <div class="input-group input-group-sm" style="width: 250px;">
+        <span class="input-group-text bg-white">
+            <i class="fas fa-search"></i>
+        </span>
+        <input type="text" id="assuranceSearchInput" class="form-control" placeholder="Rechercher..."> 
+    </div>
+    <form method="get" class="mb-4 p-3 bg-light rounded">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label for="type" class="form-label">Type</label>
+            <select name="type" id="type" class="form-select">
+                <option value="">Tous</option>
+                <option value="Auto" {{ app.request.query.get('type') == 'Auto' ? 'selected' }}>Auto</option>
+                <option value="Santé" {{ app.request.query.get('type') == 'Santé' ? 'selected' }}>Santé</option>
+            </select>
+        </div>
+        
+        <div class="col-md-3">
+            <label for="statut" class="form-label">Statut</label>
+            <select name="statut" id="statut" class="form-select">
+                <option value="">Tous</option>
+                <option value="Actif" {{ app.request.query.get('statut') == 'Actif' ? 'selected' }}>Actif</option>
+                <option value="Expiré" {{ app.request.query.get('statut') == 'Expiré' ? 'selected' }}>Expiré</option>
+            </select>
+        </div>
+        
+        <div class="col-md-3">
+            <label for="date_min" class="form-label">Expire après</label>
+            <input type="date" name="date_min" id="date_min" 
+                   value="{{ app.request.query.get('date_min') }}" 
+                   class="form-control">
+        </div>
+        
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">
+                <i class="fas fa-filter"></i> Filtrer
+            </button>
+            <a href="{{ path('app_assurance_index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-times"></i> Réinitialiser
+            </a>
+        </div>
+    </div>
+</form>
     </div>
 
     <!-- Content Row -->
@@ -173,16 +236,112 @@
                     <div class="table-responsive">
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Type</th>
-                                    <th>Montant</th>
-                                    <th>Dates</th>
-                                    <th>Statut</th>
-                                    <th>Client</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
+    <tr>
+        <th>
+            <a href="{{ path('app_assurance_index', {
+                'sort': 'a.id',
+                'direction': (current_sort == 'a.id' and current_direction == 'asc') ? 'desc' : 'asc',
+                'type': app.request.query.get('type'),
+                'statut': app.request.query.get('statut'),
+                'date_min': app.request.query.get('date_min'),
+                'page': app.request.query.get('page')
+            }) }}">
+                ID
+                {% if current_sort == 'a.id' %}
+                    <i class="fas fa-sort-{{ current_direction == 'asc' ? 'up' : 'down' }}"></i>
+                {% else %}
+                    <i class="fas fa-sort"></i>
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ path('app_assurance_index', {
+                'sort': 'a.type',
+                'direction': (current_sort == 'a.type' and current_direction == 'asc') ? 'desc' : 'asc',
+                'type': app.request.query.get('type'),
+                'statut': app.request.query.get('statut'),
+                'date_min': app.request.query.get('date_min'),
+                'page': app.request.query.get('page')
+            }) }}">
+                Type
+                {% if current_sort == 'a.type' %}
+                    <i class="fas fa-sort-{{ current_direction == 'asc' ? 'up' : 'down' }}"></i>
+                {% else %}
+                    <i class="fas fa-sort"></i>
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ path('app_assurance_index', {
+                'sort': 'a.montant',
+                'direction': (current_sort == 'a.montant' and current_direction == 'asc') ? 'desc' : 'asc',
+                'type': app.request.query.get('type'),
+                'statut': app.request.query.get('statut'),
+                'date_min': app.request.query.get('date_min'),
+                'page': app.request.query.get('page')
+            }) }}">
+                Montant
+                {% if current_sort == 'a.montant' %}
+                    <i class="fas fa-sort-{{ current_direction == 'asc' ? 'up' : 'down' }}"></i>
+                {% else %}
+                    <i class="fas fa-sort"></i>
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ path('app_assurance_index', {
+                'sort': 'a.dateSouscription',
+                'direction': (current_sort == 'a.dateSouscription' and current_direction == 'asc') ? 'desc' : 'asc',
+                'type': app.request.query.get('type'),
+                'statut': app.request.query.get('statut'),
+                'date_min': app.request.query.get('date_min'),
+                'page': app.request.query.get('page')
+            }) }}">
+                Dates
+                {% if current_sort == 'a.dateSouscription' %}
+                    <i class="fas fa-sort-{{ current_direction == 'asc' ? 'up' : 'down' }}"></i>
+                {% else %}
+                    <i class="fas fa-sort"></i>
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ path('app_assurance_index', {
+                'sort': 'a.statut',
+                'direction': (current_sort == 'a.statut' and current_direction == 'asc') ? 'desc' : 'asc',
+                'type': app.request.query.get('type'),
+                'statut': app.request.query.get('statut'),
+                'date_min': app.request.query.get('date_min'),
+                'page': app.request.query.get('page')
+            }) }}">
+                Statut
+                {% if current_sort == 'a.statut' %}
+                    <i class="fas fa-sort-{{ current_direction == 'asc' ? 'up' : 'down' }}"></i>
+                {% else %}
+                    <i class="fas fa-sort"></i>
+                {% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ path('app_assurance_index', {
+                'sort': 'u.nom',
+                'direction': (current_sort == 'u.nom' and current_direction == 'asc') ? 'desc' : 'asc',
+                'type': app.request.query.get('type'),
+                'statut': app.request.query.get('statut'),
+                'date_min': app.request.query.get('date_min'),
+                'page': app.request.query.get('page')
+            }) }}">
+                Client
+                {% if current_sort == 'u.nom' %}
+                    <i class="fas fa-sort-{{ current_direction == 'asc' ? 'up' : 'down' }}"></i>
+                {% else %}
+                    <i class="fas fa-sort"></i>
+                {% endif %}
+            </a>
+        </th>
+        <th>Actions</th>
+    </tr>
+</thead>
                             <tbody>
                             {% for assurance in assurances %}
                                 <tr>
@@ -224,8 +383,8 @@
                                             -
                                         {% endif %}
                                     </td>
-                                    <td>
-                                        <div class="d-flex">
+                                    <td >
+                                        <div class="d-flex justify-content-around">
                                             <a href="{{ path('app_assurance_show', {'id': assurance.id}) }}" 
                                                class="btn btn-sm btn-outline-primary mr-1"
                                                title="Détails">
@@ -254,6 +413,28 @@
                             {% endfor %}
                             </tbody>
                         </table>
+                        {# Pagination #}
+<div class="navigation mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {{ (assurances.getCurrentPageNumber() == 1) ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ (assurances.getCurrentPageNumber() > 1) ? '?page=' ~ (assurances.getCurrentPageNumber() - 1) : '#' }}">
+                &laquo; Previous
+            </a>
+        </li>
+        
+        {% for page in 1..assurances.getPageCount() %}
+            <li class="page-item {{ (page == assurances.getCurrentPageNumber()) ? 'active' : '' }}">
+                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+            </li>
+        {% endfor %}
+        
+        <li class="page-item {{ (assurances.getCurrentPageNumber() == assurances.getPageCount()) ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ (assurances.getCurrentPageNumber() < assurances.getPageCount()) ? '?page=' ~ (assurances.getCurrentPageNumber() + 1) : '#' }}">
+                Next &raquo;
+            </a>
+        </li>
+    </ul>
+</div>
                     </div>
                 </div>
             </div>
@@ -261,63 +442,72 @@
     </div>
 </div>
 {% endblock %}
-
 {% block javascripts %}
     {{ parent() }}
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Carrousel des destinations
-        document.addEventListener('DOMContentLoaded', function() {
-            const track = document.querySelector('.destinations-track');
-            const prevBtn = document.querySelector('.prev-dest');
-            const nextBtn = document.querySelector('.next-dest');
-            const cards = document.querySelectorAll('.destination-card');
-            
-            if (cards.length > 0) {
-                const cardStyle = window.getComputedStyle(cards[0]);
-                const cardMarginRight = parseFloat(cardStyle.marginRight);
-                const cardWidth = cards[0].offsetWidth + cardMarginRight;
-                const visibleCards = Math.floor(document.querySelector('.destinations-carousel').offsetWidth / cardWidth);
-                let currentPosition = 0;
-                const maxPosition = -(cards.length - visibleCards) * cardWidth;
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('assuranceSearchInput');
+            const table = document.getElementById('dataTable');
+            const tbody = table.querySelector('tbody');
 
-                nextBtn.addEventListener('click', () => {
-                    currentPosition = Math.max(currentPosition - (visibleCards * cardWidth), maxPosition);
-                    track.style.transform = `translateX(${currentPosition}px)`;
-                    updateArrows();
+            searchInput.addEventListener('input', function () {
+                const value = this.value.trim().toLowerCase();
+                const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => !r.classList.contains('no-results-message'));
+                let anyVisible = false;
+
+                // Supprimer ancien message "aucun résultat"
+                const existingMessage = tbody.querySelector('.no-results-message');
+                if (existingMessage) existingMessage.remove();
+
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const type = cells[1]?.textContent.toLowerCase() || '';
+                    const montant = cells[2]?.textContent.toLowerCase() || '';
+                    const statut = cells[4]?.textContent.toLowerCase() || '';
+                    const client = cells[5]?.textContent.toLowerCase() || '';
+
+                    const match =
+                        type.includes(value) ||
+                        montant.includes(value) ||
+                        statut.includes(value) ||
+                        client.includes(value);
+
+                    row.style.display = match || value === '' ? '' : 'none';
+
+                    if (match) anyVisible = true;
                 });
 
-                prevBtn.addEventListener('click', () => {
-                    currentPosition = Math.min(currentPosition + (visibleCards * cardWidth), 0);
-                    track.style.transform = `translateX(${currentPosition}px)`;
-                    updateArrows();
-                });
-
-                function updateArrows() {
-                    prevBtn.style.visibility = currentPosition === 0 ? 'hidden' : 'visible';
-                    nextBtn.style.visibility = currentPosition <= maxPosition ? 'hidden' : 'visible';
+                // Si aucun résultat trouvé
+                if (!anyVisible && value !== '') {
+                    const tr = document.createElement('tr');
+                    tr.className = 'no-results-message';
+                    tr.innerHTML = `
+                        <td colspan="7" class="text-center py-4">
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Aucune assurance ne correspond à "${value}"
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
                 }
+            });
 
-                // Initial setup
-                updateArrows();
-                
-                // Handle window resize
-                window.addEventListener('resize', function() {
-                    const newVisibleCards = Math.floor(document.querySelector('.destinations-carousel').offsetWidth / cardWidth);
-                    const newMaxPosition = -(cards.length - newVisibleCards) * cardWidth;
-                    
-                    if (currentPosition < newMaxPosition) {
-                        currentPosition = newMaxPosition;
-                        track.style.transform = `translateX(${currentPosition}px)`;
+            // GESTION SUPPRESSION
+            document.querySelectorAll('.delete-form').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    if (!confirm('Êtes-vous sûr de vouloir supprimer cette assurance ?')) {
+                        e.preventDefault();
                     }
-                    
-                    updateArrows();
                 });
-            }
+            });
 
-            // Navbar scroll effect
-            window.addEventListener('scroll', function() {
-                document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 100);
+            // SCROLL NAVBAR
+            window.addEventListener('scroll', function () {
+                const navbar = document.querySelector('.navbar');
+                if (navbar) {
+                    navbar.classList.toggle('scrolled', window.scrollY > 100);
+                }
             });
         });
     </script>

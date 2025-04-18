@@ -461,6 +461,34 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
+        /* Footer Styles */
+        .footer-section {
+            background: linear-gradient(135deg, #2c3e50, #4a6491) !important;
+        }
+        
+        .footer-section a {
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: #fff !important;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
     </style>
 {% endblock %}
 
@@ -710,78 +738,44 @@
             </div>
         </div>
     </section>
- {% if user %}
-<!-- User Profile Management Section -->
-<section class="user-profile-section py-5 bg-light">
-    <div class="container">
-        <h2 class="mb-4">Gérer mon compte</h2>
+ <!-- Footer Section Simplifié -->
+    <footer class="footer-section bg-dark text-white pt-5 pb-4">
+        <div class="container">
+            <div class="row">
+                <!-- Column 1: Logo & Description -->
+                <div class="col-lg-6 mb-4">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" width="60" height="60" class="mb-3">
+                    <p class="text-muted">
+                        Nous offrons les meilleures solutions pour vos voyages d'affaires, 
+                        combinant hébergement premium, espaces de coworking et services sur mesure.
+                    </p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
 
-        <form method="POST" action="{{ path('app_update_user') }}">
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label for="nom" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="nom" name="nom" value="{{ user.nom }}" required>
-            {% if form_errors.nom is defined %}
-                {% for error in form_errors.nom %}
-                    <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
+                <!-- Column 3: Contact -->
+                <div class="col-lg-6 mb-4">
+                    <h5 class="text-uppercase mb-4">Contactez-nous</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Rue des Affaires, Paris</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +33 1 23 45 67 89</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> contact@businessvoyage.com</li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="my-4 bg-secondary">
+
+            <!-- Copyright -->
+            <div class="text-center">
+                <p class="text-muted mb-0">&copy; 2023 Business Voyage. Tous droits réservés.</p>
+            </div>
         </div>
-
-        <div class="col-md-6">
-            <label for="prenom" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="prenom" name="prenom" value="{{ user.prenom }}" required>
-            {% if form_errors.prenom is defined %}
-                {% for error in form_errors.prenom %}
-                    <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <div class="col-md-6">
-            <label for="age" class="form-label">Âge</label>
-            <input type="number" class="form-control" id="age" name="age" value="{{ user.age }}" required>
-            {% if form_errors.age is defined %}
-                {% for error in form_errors.age %}
-                    <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <div class="col-md-6">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-            {% if form_errors.email is defined %}
-                {% for error in form_errors.email %}
-                    <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
-
-        <div class="col-md-6">
-            <label for="password" class="form-label">Nouveau mot de passe</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Laisser vide si inchangé">
-            {% if form_errors.password is defined %}
-                {% for error in form_errors.password %}
-                    <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="mt-4 d-flex justify-content-between">
-        <button type="submit" class="btn btn-primary">Mettre à jour mes infos</button>
-
-        <form method="POST" action="{{ path('app_delete_user') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');">
-            <button type="submit" class="btn btn-outline-danger">Supprimer mon compte</button>
-        </form>
-    </div>
-</form>
-
-    </div>
-</section>
-{% endif %}
-
+    </footer>
 
 {% endblock %}
 

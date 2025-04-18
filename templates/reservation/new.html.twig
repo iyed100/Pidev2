@@ -14,10 +14,113 @@
         content: " *";
         color: #dc3545;
     }
+     /* Hero Section */
+        .hero-section {
+                      background: url('/images/background.jpg') center;
+
+            height: 7vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        .navbar a { 
+            color: white !important; 
+            font-weight: 500;
+        }
+        
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1rem;
+        }
+        
+        .hero-text p {
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        /* Footer Styles */
+        .footer-section {
+            background: linear-gradient(135deg, #2c3e50, #4a6491) !important;
+        }
+        
+        .footer-section a {
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: #fff !important;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
 </style>
 {% endblock %}
 
 {% block body %}
+<header class="hero-section">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" width="50" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                     <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_acceuil') }}">
+                            <i class="fas fa-hotel me-1"></i> home
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#">Hébergement</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Espace de coworking</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Événements</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Avis et réclamation</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_reservation_index') }}">
+                            <i class="fas fa-calendar-check me-1"></i> Mes Réservations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_hotel_index') }}">
+                            <i class="fas fa-hotel me-1"></i> Hotels
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('app_assurance_index') }}">
+                            <i class="fas fa-shield-alt me-1"></i> Mes Assurances
+                        </a>
+                    </li>
+                </ul>
+
+                
+            </div>
+        </div>
+    </nav>
+</header>
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -160,6 +263,44 @@
         </div>
     </div>
 </div>
+ <!-- Footer Section Simplifié -->
+    <footer class="footer-section bg-dark text-white pt-5 pb-4">
+        <div class="container">
+            <div class="row">
+                <!-- Column 1: Logo & Description -->
+                <div class="col-lg-6 mb-4">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo" width="60" height="60" class="mb-3">
+                    <p class="text-muted">
+                        Nous offrons les meilleures solutions pour vos voyages d'affaires, 
+                        combinant hébergement premium, espaces de coworking et services sur mesure.
+                    </p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <!-- Column 3: Contact -->
+                <div class="col-lg-6 mb-4">
+                    <h5 class="text-uppercase mb-4">Contactez-nous</h5>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Rue des Affaires, Paris</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +33 1 23 45 67 89</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> contact@businessvoyage.com</li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="my-4 bg-secondary">
+
+            <!-- Copyright -->
+            <div class="text-center">
+                <p class="text-muted mb-0">&copy; 2023 Business Voyage. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
 {% endblock %}
 
 {% block javascripts %}

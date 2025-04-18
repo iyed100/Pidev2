@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -27,7 +27,7 @@ class Reservation
         $this->id = $id;
         return $this;
     }
-
+ 
     #[ORM\ManyToOne(targetEntity: Hotel::class, inversedBy: 'reservations')]
     #[ORM\JoinColumn(name: 'idhotel', referencedColumnName: 'id')]
     private ?Hotel $hotel = null;
