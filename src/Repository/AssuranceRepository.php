@@ -13,7 +13,51 @@ class AssuranceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Assurance::class);
     }
+    // Ajoute cette méthode dans AssuranceRepository.php
+    public function countByType(): array
+    {
+        $results = $this->createQueryBuilder('a')
+            ->select('a.type, COUNT(a.id) as count')
+            ->groupBy('a.type')
+            ->getQuery()
+            ->getResult();
+    
+        // Formatte les résultats pour être sûr de la structure
+        $formattedResults = [];
+        foreach ($results as $result) {
+            $formattedResults[] = [
+                'type' => $result['type'],
+                'count' => (int)$result['count']
+            ];
+        }
+    
+        // Debug temporaire
+        dump($formattedResults);
+    
+        return $formattedResults;
+    }
+    public function countByStatus(): array
+    {
+        $results = $this->createQueryBuilder('a')
+            ->select('a.statut as status, COUNT(a.id) as count')
+            ->groupBy('a.statut')
+            ->getQuery()
+            ->getResult();
 
+        // Formatte les résultats
+        $formattedResults = [];
+        foreach ($results as $result) {
+            $formattedResults[] = [
+                'status' => $result['status'] ?? 'Inconnu',
+                'count' => (int)$result['count']
+            ];
+        }
+
+        // Debug temporaire
+        dump($formattedResults);
+
+        return $formattedResults;
+    }
     /**
      * Trouve toutes les assurances d'un utilisateur
      */

@@ -19,100 +19,116 @@ use App\Repository\UtilisateurRepository;
 final class AssuranceController extends AbstractController
 {
     #[Route('/', name: 'app_assurance_index', methods: ['GET'])]
-    public function index(
-        AssuranceRepository $assuranceRepository,
-        SessionInterface $session,
-        UtilisateurRepository $userRepo,
-        Request $request,
-        PaginatorInterface $paginator
-    ): Response {
-        $userId = $session->get('user_id');
-        if (!$userId) {
-            return $this->redirectToRoute('app_login');
-        }
+public function index(
+    AssuranceRepository $assuranceRepository,
+    SessionInterface $session,
+    UtilisateurRepository $userRepo,
+    Request $request,
+    PaginatorInterface $paginator
+): Response {
+    $userId = $session->get('user_id');
+    if (!$userId) {
+        return $this->redirectToRoute('app_login');
+    }
 
-        $user = $userRepo->find($userId);
-        if (!$user) {
-            $session->clear();
-            return $this->redirectToRoute('app_login');
-        }
+    $user = $userRepo->find($userId);
+    if (!$user) {
+        $session->clear();
+        return $this->redirectToRoute('app_login');
+    }
 
-        // Construction de la requête de base avec jointures
-        $queryBuilder = $assuranceRepository->createQueryBuilder('a')
-            ->leftJoin('a.reservation', 'r')
-            ->leftJoin('r.utilisateur', 'u');
+    // Construction de la requête de base avec jointures
+    $queryBuilder = $assuranceRepository->createQueryBuilder('a')
+        ->leftJoin('a.reservation', 'r')
+        ->leftJoin('r.utilisateur', 'u');
 
-        // Gestion du tri
-        $sort = $request->query->get('sort', 'a.id');
-        $direction = $request->query->get('direction', 'asc');
+    // Ajout de la recherche globale
+   // Ajout de la recherche spécifique (seulement type et montant)
+   $searchTerm = $request->query->get('search');
+   if ($searchTerm) {
+       // Essayez de convertir en nombre pour le montant
+       $numericSearch = is_numeric($searchTerm) ? (float)$searchTerm : null;
+       
+       $queryBuilder->andWhere('
+           a.type = :search OR 
+           (:numericSearch IS NOT NULL AND a.montant = :numericSearch)
+       ')
+       ->setParameter('search', $searchTerm)
+       ->setParameter('numericSearch', $numericSearch);
+   }
+    // Gestion du tri
+    $sort = $request->query->get('sort', 'a.id');
+    $direction = $request->query->get('direction', 'asc');
 
-        // Validation des champs de tri autorisés
-        $allowedSorts = [
-            'a.id', 
-            'a.type', 
-            'a.montant', 
-            'a.date_souscription',  // Changé de dateSouscription à date_souscription
-            'a.date_expiration',     // Changé de dateExpiration à date_expiration
-            'a.statut', 
-            'u.nom'
-        ];
-        
-        if (in_array($sort, $allowedSorts)) {
-            $queryBuilder->orderBy($sort, $direction);
-        }
+    // Validation des champs de tri autorisés
+    $allowedSorts = [
+        'a.id', 
+        'a.type', 
+        'a.montant', 
+        'a.date_souscription',
+        'a.date_expiration',
+        'a.statut', 
+        'u.nom'
+    ];
+    
+    if (in_array($sort, $allowedSorts)) {
+        $queryBuilder->orderBy($sort, $direction);
+    }
 
-        // Filtres
-        $filters = $request->query->all();
-        
-        // Filtre par type
-        if (isset($filters['type']) && $filters['type'] !== '') {
-            $queryBuilder->andWhere('a.type = :type')
-                        ->setParameter('type', $filters['type']);
-        }
-        
-        // Filtre par statut
-        if (isset($filters['statut']) && $filters['statut'] !== '') {
-            $queryBuilder->andWhere('a.statut = :statut')
-                        ->setParameter('statut', $filters['statut']);
-        }
-        
-        // Filtre par date minimum (corrigé pour utiliser date_expiration)
-        if (isset($filters['date_min']) && $filters['date_min'] !== '') {
-            $queryBuilder->andWhere('a.date_expiration >= :dateMin')  // Changé ici
-                        ->setParameter('dateMin', new \DateTime($filters['date_min']));
-        }
+    // Filtres
+    $filters = $request->query->all();
+    
+    // Filtre par type
+    if (isset($filters['type']) && $filters['type'] !== '') {
+        $queryBuilder->andWhere('a.type = :type')
+                    ->setParameter('type', $filters['type']);
+    }
+    
+    // Filtre par statut
+    if (isset($filters['statut']) && $filters['statut'] !== '') {
+        $queryBuilder->andWhere('a.statut = :statut')
+                    ->setParameter('statut', $filters['statut']);
+    }
+    
+    // Filtre par date minimum
+    if (isset($filters['date_min']) && $filters['date_min'] !== '') {
+        $queryBuilder->andWhere('a.date_expiration >= :dateMin')
+                    ->setParameter('dateMin', new \DateTime($filters['date_min']));
+    }
 
-        // Filtre par utilisateur si non admin
-        if ($user->getRole() !== 'admin') {
-            $queryBuilder->andWhere('r.utilisateur = :user')
-                        ->setParameter('user', $user);
-        }
+    // Filtre par utilisateur si non admin
+    if ($user->getRole() !== 'admin') {
+        $queryBuilder->andWhere('r.utilisateur = :user')
+                    ->setParameter('user', $user);
+    }
 
-        // Pagination
-        $assurances = $paginator->paginate(
-            $queryBuilder->getQuery(),
-            $request->query->getInt('page', 1),
-            5
-        );
+    // Pagination
+    $assurances = $paginator->paginate(
+        $queryBuilder->getQuery(),
+        $request->query->getInt('page', 1),
+        5
+    );
 
-        // Rendu pour admin
-        if ($user->getRole() === 'admin') {
-            return $this->render('admin/assurances/index.html.twig', [
-                'assurances' => $assurances,
-                'current_filters' => $filters,
-                'current_sort' => $sort,
-                'current_direction' => $direction
-            ]);
-        }
-
-        // Rendu pour utilisateur normal
-        return $this->render('assurance/index.html.twig', [
+    // Rendu pour admin
+    if ($user->getRole() === 'admin') {
+        return $this->render('admin/assurances/index.html.twig', [
             'assurances' => $assurances,
             'current_filters' => $filters,
             'current_sort' => $sort,
-            'current_direction' => $direction
+            'current_direction' => $direction,
+            'search_term' => $searchTerm
         ]);
     }
+
+    // Rendu pour utilisateur normal
+    return $this->render('assurance/index.html.twig', [
+        'assurances' => $assurances,
+        'current_filters' => $filters,
+        'current_sort' => $sort,
+        'current_direction' => $direction,
+        'search_term' => $searchTerm
+    ]);
+}
     #[Route('/new', name: 'app_assurance_new', methods: ['GET', 'POST'])]
 public function new(
     Request $request, 

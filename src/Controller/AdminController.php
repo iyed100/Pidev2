@@ -8,13 +8,20 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\UtilisateurRepository;
+use App\Repository\AssuranceRepository;
+use App\Repository\ReservationRepository;
 
 class AdminController extends AbstractController
 {
     #[Route('/admin', name: 'admin_dashboard')]
-    public function dashboard(SessionInterface $session, UtilisateurRepository $userRepository): Response
+    public function dashboard(
+        SessionInterface $session, 
+        UtilisateurRepository $userRepository,
+        AssuranceRepository $assuranceRepository,
+        ReservationRepository $reservationRepository
+    ): Response
     {
-        // Check if a user is logged in via session
+        // Vérifie si l'utilisateur est connecté
         if (!$session->has('user_id')) {
             return $this->redirectToRoute('app_login_back');
         }
@@ -22,18 +29,66 @@ class AdminController extends AbstractController
         $userId = $session->get('user_id');
         $user = $userRepository->find($userId);
 
-        // If user not found or not an admin, destroy session and redirect
+        // Vérifie si l'utilisateur est admin
         if (!$user || $user->getRole() !== 'admin') {
-            $session->invalidate(); // Clear the session completely
+            $session->invalidate();
             return $this->redirectToRoute('app_login_back');
         }
 
-        // User is an admin — allow access to dashboard
+        // Données pour les assurances par type
+        $assurancesByType = $assuranceRepository->countByType();
+        $assuranceLabels = [];
+        $assuranceData = [];
+        if (empty($assurancesByType)) {
+            $assuranceLabels = ['Aucune donnée'];
+            $assuranceData = [0];
+        } else {
+            foreach ($assurancesByType as $item) {
+                $assuranceLabels[] = $item['type'] ?? 'Inconnu';
+                $assuranceData[] = (int)($item['count'] ?? 0);
+            }
+        }
+
+        // Données pour les réservations par hôtel
+        $reservationsByHotel = $reservationRepository->countByHotel();
+        $hotelLabels = [];
+        $hotelData = [];
+        if (empty($reservationsByHotel)) {
+            $hotelLabels = ['Aucune donnée'];
+            $hotelData = [0];
+        } else {
+            foreach ($reservationsByHotel as $item) {
+                $hotelLabels[] = $item['hotel_name'] ?? 'Inconnu';
+                $hotelData[] = (int)($item['count'] ?? 0);
+            }
+        }
+
+        // Données pour les assurances par statut (pour le pie chart)
+        $assurancesByStatus = $assuranceRepository->countByStatus();
+        $statusLabels = [];
+        $statusData = [];
+        if (empty($assurancesByStatus)) {
+            $statusLabels = ['Aucune donnée'];
+            $statusData = [0];
+        } else {
+            foreach ($assurancesByStatus as $item) {
+                $statusLabels[] = $item['status'] ?? 'Inconnu';
+                $statusData[] = (int)($item['count'] ?? 0);
+            }
+        }
+
         return $this->render('admin/dashboard.html.twig', [
-            'user' => $user
+            'user' => $user,
+            'assurances_count' => $assuranceRepository->count([]),
+            'reclamations_count' => $reservationRepository->count([]),
+            'chart_labels' => $assuranceLabels,
+            'chart_data' => $assuranceData,
+            'hotel_labels' => $hotelLabels,
+            'hotel_data' => $hotelData,
+            'status_labels' => $statusLabels,
+            'status_data' => $statusData
         ]);
     }
-
     #[Route('/loginback', name: 'app_login_back')]
     public function login(Request $request, UtilisateurRepository $userRepository, SessionInterface $session): Response
     {

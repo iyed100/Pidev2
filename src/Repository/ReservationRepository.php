@@ -17,6 +17,29 @@ class ReservationRepository extends ServiceEntityRepository
     /**
      * Trouve toutes les réservations d'un utilisateur
      */
+    public function countByHotel(): array
+    {
+        $results = $this->createQueryBuilder('r')
+            ->select('h.nom as hotel_name, COUNT(r.id) as count')
+            ->leftJoin('r.hotel', 'h')
+            ->groupBy('h.id')
+            ->getQuery()
+            ->getResult();
+
+        // Formatte les résultats
+        $formattedResults = [];
+        foreach ($results as $result) {
+            $formattedResults[] = [
+                'hotel_name' => $result['hotel_name'] ?? 'Hôtel inconnu',
+                'count' => (int)$result['count']
+            ];
+        }
+
+        // Debug temporaire
+        dump($formattedResults);
+
+        return $formattedResults;
+    }
     public function findByUser(Utilisateur $user)
     {
         return $this->createQueryBuilder('r')

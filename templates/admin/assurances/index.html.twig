@@ -175,12 +175,30 @@
         <h1 class="h3 mb-0 text-gray-800">
             <i class="fas fa-shield-alt text-primary"></i> Gestion des Assurances
         </h1>
-         <div class="input-group input-group-sm" style="width: 250px;">
-        <span class="input-group-text bg-white">
-            <i class="fas fa-search"></i>
-        </span>
-        <input type="text" id="assuranceSearchInput" class="form-control" placeholder="Rechercher..."> 
-    </div>
+        <!-- Remplacez le bloc de recherche existant par : -->
+<div class="input-group input-group-sm" style="width: 250px;">
+    <input 
+        type="text" 
+        id="assuranceSearchInput" 
+        class="form-control" 
+        placeholder="Rechercher..."
+        value="{{ app.request.query.get('search') ?? '' }}"
+    >
+    <button class="btn btn-primary" type="button" id="searchButton">
+        <i class="fas fa-search"></i>
+    </button>
+    {% if app.request.query.get('search') %}
+        <a href="{{ path('app_assurance_index', {
+            'type': app.request.query.get('type'),
+            'statut': app.request.query.get('statut'),
+            'date_min': app.request.query.get('date_min'),
+            'sort': app.request.query.get('sort'),
+            'direction': app.request.query.get('direction')
+        }) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-times"></i>
+        </a>
+    {% endif %}
+</div>
     <form method="get" class="mb-4 p-3 bg-light rounded">
     <div class="row g-3">
         <div class="col-md-3">
@@ -445,53 +463,36 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('assuranceSearchInput');
-            const table = document.getElementById('dataTable');
-            const tbody = table.querySelector('tbody');
-
-            searchInput.addEventListener('input', function () {
-                const value = this.value.trim().toLowerCase();
-                const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => !r.classList.contains('no-results-message'));
-                let anyVisible = false;
-
-                // Supprimer ancien message "aucun résultat"
-                const existingMessage = tbody.querySelector('.no-results-message');
-                if (existingMessage) existingMessage.remove();
-
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    const type = cells[1]?.textContent.toLowerCase() || '';
-                    const montant = cells[2]?.textContent.toLowerCase() || '';
-                    const statut = cells[4]?.textContent.toLowerCase() || '';
-                    const client = cells[5]?.textContent.toLowerCase() || '';
-
-                    const match =
-                        type.includes(value) ||
-                        montant.includes(value) ||
-                        statut.includes(value) ||
-                        client.includes(value);
-
-                    row.style.display = match || value === '' ? '' : 'none';
-
-                    if (match) anyVisible = true;
-                });
-
-                // Si aucun résultat trouvé
-                if (!anyVisible && value !== '') {
-                    const tr = document.createElement('tr');
-                    tr.className = 'no-results-message';
-                    tr.innerHTML = `
-                        <td colspan="7" class="text-center py-4">
-                            <div class="alert alert-warning mb-0">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                Aucune assurance ne correspond à "${value}"
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                }
-            });
+      document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('assuranceSearchInput');
+    const searchButton = document.getElementById('searchButton');
+    
+    function updateUrlWithSearch() {
+        const searchTerm = searchInput.value.trim();
+        const url = new URL(window.location.href);
+        
+        // Mettre à jour ou supprimer le paramètre search
+        if (searchTerm) {
+            url.searchParams.set('search', searchTerm);
+        } else {
+            url.searchParams.delete('search');
+        }
+        
+        // Réinitialiser la pagination lors d'une nouvelle recherche
+        url.searchParams.delete('page');
+        
+        window.location.href = url.toString();
+    }
+    
+    // Recherche au clic sur le bouton
+    searchButton.addEventListener('click', updateUrlWithSearch);
+    
+    // Recherche lors de la pression sur Entrée
+    searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            updateUrlWithSearch();
+        }
+    });
 
             // GESTION SUPPRESSION
             document.querySelectorAll('.delete-form').forEach(form => {
