@@ -47,178 +47,243 @@ final class ReservationController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
     
-        // Construction de la requête de base (identique à votre version)
-        $queryBuilder = $reservationRepository->createQueryBuilder('r');
+        // Récupérer toutes les réservations avec leurs relations
+        $reservations = $reservationRepository->findAllWithDetails($user);
     
-        // Ajout des filtres (nouveauté)
+        // Ajout des filtres
         $filters = $request->query->all();
-        
-        if (isset($filters['type_service']) && $filters['type_service'] !== '') {
-            $queryBuilder->andWhere('r.typeservice = :typeService')
-                        ->setParameter('typeService', $filters['type_service']);
-        }
-        
-        if (isset($filters['statut']) && $filters['statut'] !== '') {
-            $queryBuilder->andWhere('r.statut = :statut')
-                        ->setParameter('statut', $filters['statut']);
+        $filteredReservations = $reservations;
+    
+        if (!empty($filters['type_service'])) {
+            $filteredReservations = array_filter($filteredReservations, function ($reservation) use ($filters) {
+                return $reservation->getTypeservice() === $filters['type_service'];
+            });
         }
     
-        // Filtre utilisateur (identique à votre version)
-        if ($user->getRole() !== 'admin') {
-            $queryBuilder->andWhere('r.utilisateur = :user')
-                        ->setParameter('user', $user);
+        if (!empty($filters['statut'])) {
+            $filteredReservations = array_filter($filteredReservations, function ($reservation) use ($filters) {
+                return $reservation->getStatut() === $filters['statut'];
+            });
         }
     
-        // Pagination (identique à votre version)
-        $reservations = $paginator->paginate(
-            $queryBuilder->getQuery(),
+        // Pagination
+        $reservationsPaginated = $paginator->paginate(
+            $filteredReservations,
             $request->query->getInt('page', 1),
             5
         );
     
-        // Rendu (identique à votre version)
+        // Rendu
         if ($user->getRole() === 'admin') {
             return $this->render('admin/reservations/index.html.twig', [
-                'reservations' => $reservations,
-                'current_filters' => $filters // Passer les filtres au template
+                'reservations' => $reservationsPaginated,
+                'current_filters' => $filters
             ]);
         }
     
         return $this->render('reservation/index.html.twig', [
-            'reservations' => $reservations,
-            'current_filters' => $filters // Passer les filtres au template
+            'reservations' => $reservationsPaginated,
+            'current_filters' => $filters
         ]);
     }
 
-#[Route('/new', name: 'app_reservation_new', methods: ['GET', 'POST'])]
-public function new(
-    Request $request, 
-    EntityManagerInterface $entityManager,
-    HotelRepository $hotelRepo,
-    CoworkingSpaceRepository $coworkingRepo,
-    TransportMeanRepository $transportRepo,
-    SessionInterface $session,
-    UtilisateurRepository $userRepo
-): Response {
-    $reservation = new Reservation();
-    $reservation->setStatut('en attente'); // Statut forcé
+    #[Route('/new', name: 'app_reservation_new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request, 
+        EntityManagerInterface $entityManager,
+        HotelRepository $hotelRepo,
+        CoworkingSpaceRepository $coworkingRepo,
+        TransportMeanRepository $transportRepo,
+        SessionInterface $session,
+        UtilisateurRepository $userRepo
+    ): Response {
+        $reservation = new Reservation();
+        $reservation->setStatut('en attente');
+        
+        // Récupérer les IDs depuis l'URL
+        $idhotel = $request->query->get('idhotel');
+        $idspace = $request->query->get('idspace');
+        $idtransport = $request->query->get('idtransport');
+        
+        // Initialiser les options du formulaire
+        $formOptions = [
+            'preselected_hotel' => null,
+            'preselected_coworking' => null,
+            'preselected_transport' => null,
+            'preselected_service' => null,
+            'require_nights' => true,
+            'require_hours' => false
+        ];
     
-    // Récupérer les IDs depuis l'URL
-    $idhotel = $request->query->get('idhotel');
-    $idspace = $request->query->get('idspace');
-    $idtransport = $request->query->get('idtransport');
-    
-    // Initialiser les options du formulaire
-    $formOptions = [
-        'preselected_hotel' => null,
-        'preselected_coworking' => null,
-        'preselected_transport' => null,
-        'preselected_service' => null,
-        'require_nights' => true,
-        'require_hours' => false
-    ];
-
-    // Gérer l'hôtel
-    if ($idhotel) {
-        $hotel = $hotelRepo->find($idhotel);
-        if ($hotel) {
-            $reservation->setHotel($hotel);
-            $reservation->setTypeservice('Hôtel');
-            $formOptions['preselected_hotel'] = $hotel;
-            $formOptions['preselected_service'] = 'Hôtel';
-        }
-    }
-    
-    // Gérer l'espace de coworking
-    if ($idspace) {
-        $coworkingSpace = $coworkingRepo->find($idspace);
-        if ($coworkingSpace) {
-            $reservation->setCoworkingSpace($coworkingSpace);
-            $formOptions['preselected_coworking'] = $coworkingSpace;
-            
-            if (!$idhotel) {
-                $reservation->setTypeservice('Coworking');
-                $formOptions['preselected_service'] = 'Coworking';
-                $formOptions['require_hours'] = true;
-                $formOptions['require_nights'] = false;
+        // Gérer l'hôtel
+        if ($idhotel) {
+            $hotel = $hotelRepo->find($idhotel);
+            if ($hotel) {
+                $reservation->setHotel($hotel);
+                $reservation->setTypeservice('Hôtel');
+                $formOptions['preselected_hotel'] = $hotel;
+                $formOptions['preselected_service'] = 'Hôtel';
             }
         }
-    }
+        
+        // Gérer l'espace de coworking
+        if ($idspace) {
+            $coworkingSpace = $coworkingRepo->find($idspace);
+            if ($coworkingSpace) {
+                $reservation->setCoworkingSpace($coworkingSpace);
+                $formOptions['preselected_coworking'] = $coworkingSpace;
+                
+                if (!$idhotel) {
+                    $reservation->setTypeservice('Coworking');
+                    $formOptions['preselected_service'] = 'Coworking';
+                    $formOptions['require_hours'] = true;
+                    $formOptions['require_nights'] = false;
+                }
+            }
+        }
+        
+        // Gérer le transport
+        if ($idtransport) {
+            $transport = $transportRepo->find($idtransport);
+            if ($transport) {
+                $reservation->setTransportMean($transport);
+                $formOptions['preselected_transport'] = $transport;
+            }
+        }
+        
+        // Associer l'utilisateur connecté
+        $userId = $session->get('user_id');
+        if ($userId) {
+            $user = $userRepo->find($userId);
+            $reservation->setUtilisateur($user);
+        }
     
-    // Gérer le transport
-    if ($idtransport) {
-        $transport = $transportRepo->find($idtransport);
-        if ($transport) {
-            $reservation->setTransportMean($transport);
-            $formOptions['preselected_transport'] = $transport;
-        }
-    }
+        $form = $this->createForm(ReservationType::class, $reservation, $formOptions);
+        $form->handleRequest($request);
     
-    // Associer l'utilisateur connecté
-    $userId = $session->get('user_id');
-    if ($userId) {
-        $user = $userRepo->find($userId);
-        $reservation->setUtilisateur($user);
-    }
-
-    $form = $this->createForm(ReservationType::class, $reservation, $formOptions);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Contrôle de saisie manuel
-        $errors = [];
-        
-        // Validation des nombres
-        if ($formOptions['require_nights'] && $reservation->getNbrnuit() <= 0) {
-            $errors[] = 'Le nombre de nuits doit être supérieur à 0.';
-        }
-        
-        if ($formOptions['require_hours'] && $reservation->getNbrheure() <= 0) {
-            $errors[] = 'Le nombre d\'heures doit être supérieur à 0.';
-        }
-        
-        // Validation des champs obligatoires
-        if (empty($reservation->getTypeservice())) {
-            $errors[] = 'Le type de service est obligatoire.';
-        }
-        
-        if (!$reservation->getHotel() && $formOptions['preselected_service'] === 'Hôtel') {
-            $errors[] = 'L\'hôtel est obligatoire.';
-        }
-        
-        if (!$reservation->getCoworkingSpace() && $formOptions['preselected_service'] === 'Coworking') {
-            $errors[] = 'L\'espace de coworking est obligatoire.';
-        }
-        
-        if (!$reservation->getTransportMean()) {
-            $errors[] = 'Le moyen de transport est obligatoire.';
-        }
-
-        // Gestion des erreurs
-        if (!empty($errors)) {
-            foreach ($errors as $error) {
-                $this->addFlash('error', $error);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Contrôle de saisie manuel
+            $errors = [];
+            
+            // Validation des nombres
+            if ($formOptions['require_nights'] && $reservation->getNbrnuit() <= 0) {
+                $errors[] = 'Le nombre de nuits doit être supérieur à 0.';
             }
             
-            // Réaffiche le formulaire avec les données existantes
-            return $this->render('reservation/new.html.twig', [
-                'reservation' => $reservation,
-                'form' => $form->createView(),
-            ]);
-        }
+            if ($formOptions['require_hours'] && $reservation->getNbrheure() <= 0) {
+                $errors[] = 'Le nombre d\'heures doit être supérieur à 0.';
+            }
+            
+            // Validation des champs obligatoires
+            if (empty($reservation->getTypeservice())) {
+                $errors[] = 'Le type de service est obligatoire.';
+            }
+            
+            if (!$reservation->getHotel() && $formOptions['preselected_service'] === 'Hôtel') {
+                $errors[] = 'L\'hôtel est obligatoire.';
+            }
+            
+            if (!$reservation->getCoworkingSpace() && $formOptions['preselected_service'] === 'Coworking') {
+                $errors[] = 'L\'espace de coworking est obligatoire.';
+            }
+            
+            if (!$reservation->getTransportMean()) {
+                $errors[] = 'Le moyen de transport est obligatoire.';
+            }
+    
+            // Gestion des erreurs
+            if (!empty($errors)) {
+                foreach ($errors as $error) {
+                    $this->addFlash('error', $error);
+                }
+                
+                return $this->render('reservation/new.html.twig', [
+                    'reservation' => $reservation,
+                    'form' => $form->createView(),
+                ]);
+            }
+    
+            // Si tout est OK
+            $entityManager->persist($reservation);
+            $entityManager->flush();
+    
+            // Préparer le contenu de l'email directement dans le code
+            $user = $reservation->getUtilisateur();
+            $details = "Les détails de votre réservation :\n";
+            $details .= "- Type de service : {$reservation->getTypeservice()}\n";
+            if ($reservation->getHotel()) {
+                $details .= "- Hôtel : {$reservation->getHotel()->getNom()}\n";
+            }
+            if ($reservation->getCoworkingSpace()) {
+                $details .= "- Espace de coworking : {$reservation->getCoworkingSpace()->getNom()}\n";
+            }
+            if ($reservation->getTransportMean()) {
+                $details .= "- Moyen de transport : {$reservation->getTransportMean()->getNom()}\n";
+            }
+            $details .= "- Statut : {$reservation->getStatut()}\n";
+            $details .= "- Numéro de réservation : #{$reservation->getId()}\n";
+    
+            $htmlContent = "
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Confirmation de réservation</title>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            h1 { color: #2c3e50; }
+            .footer { margin-top: 20px; font-size: 14px; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <h1>Salut {$user->getPrenom()} {$user->getNom()},</h1>
+            <p>" . nl2br(htmlspecialchars($details)) . "</p>
+            <p class='footer'>Merci pour votre confiance en nous, vous pouvez maintenant passer à la procédure de paiement.</p>
+        </div>
+    </body>
+    </html>
+";
 
-        // Si tout est OK
-        $entityManager->persist($reservation);
-        $entityManager->flush();
+// Appel à l'API Mailgun avec cURL
+$apiKey = 'VOTRE_CLE_API_MAILGUN'; // Remplace par ta clé API Mailgun
+$domain = 'VOTRE_DOMAINE'; // Exemple : sandbox123.mailgun.org ou ton domaine vérifié
+$url = "https://api.mailgun.net/v3/{$domain}/messages";
 
-        return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
-    }
+$data = [
+    'from' => 'no-reply@votre-domaine.com',
+    'to' => $user->getEmail(),
+    'subject' => 'Confirmation de réservation',
+    'html' => $htmlContent
+];
 
-    return $this->render('reservation/new.html.twig', [
-        'reservation' => $reservation,
-        'form' => $form->createView(),
-    ]);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); // Mailgun utilise des données encodées en formulaire
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Authorization: Basic ' . base64_encode("api:{$apiKey}")
+]);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+if ($httpCode >= 200 && $httpCode < 300) {
+    $this->addFlash('success', 'Réservation créée et email envoyé avec succès.');
+} else {
+    $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email.');
 }
+    
+            return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+        }
+    
+        return $this->render('reservation/new.html.twig', [
+            'reservation' => $reservation,
+            'form' => $form->createView(),
+        ]);
+    }
 
 
 #[Route('/{id}', name: 'app_reservation_show', methods: ['GET'])]

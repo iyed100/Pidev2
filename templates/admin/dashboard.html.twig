@@ -5,7 +5,7 @@
 <div class="row mb-4">
     <!-- Reservations Card -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card-elegent card border-left-primary h-100 py-2">
+        <div class="card-elegant card border-left-primary h-100 py-2">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
@@ -21,7 +21,7 @@
 
     <!-- Assurances Card -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card-elegent card border-left-success h-100 py-2">
+        <div class="card-elegant card border-left-success h-100 py-2">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
@@ -35,12 +35,13 @@
         </div>
     </div>
 </div>
-<!-- Assurances par type  -->
+
+<!-- Assurances par type -->
 <div class="row mb-4">
     <div class="col-lg-12">
         <div class="card shadow h-100">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Nombre d'assurances par type</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Assurances par type</h6>
             </div>
             <div class="card-body">
                 {% if chart_labels|length > 0 and chart_labels|length == chart_data|length %}
@@ -59,12 +60,13 @@
         </div>
     </div>
 </div>
+
 <!-- Réservations par hôtel -->
 <div class="row mb-4">
     <div class="col-lg-12">
         <div class="card shadow h-100">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Nombre de réservations par hôtel</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Réservations par hôtel</h6>
             </div>
             <div class="card-body">
                 {% if hotel_labels|length > 0 and hotel_labels|length == hotel_data|length %}
@@ -83,112 +85,159 @@
         </div>
     </div>
 </div>
-<!-- Assurances par statut (Pie Chart ou Liste) -->
+
+<!-- Assurances par statut et Réservations par statut (côte à côte) -->
 <div class="row mb-4">
-    <div class="col-lg-6">
+    <!-- Assurances par statut -->
+    <div class="col-lg-6 mb-4">
         <div class="card shadow h-100">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Assurances par statut</h6>
             </div>
             <div class="card-body">
-                <div class="chart-pie" style="height: 300px; display: none;" id="pieChartContainer">
-                    <canvas id="statusPieChart"></canvas>
-                </div>
-                <div id="statusListContainer">
-                    {% if status_labels|length > 0 and status_labels|length == status_data|length %}
-                        <ul class="list-group list-group-flush">
-                            {% for index in 0..(status_labels|length - 1) %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>{{ status_labels[index]|default('Inconnu') }}</span>
-                                    <span class="badge bg-primary text-white">{{ status_data[index]|default(0) }}</span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">Aucune donnée disponible pour les assurances par statut.</p>
-                    {% endif %}
-                </div>
+                {% if status_labels|length > 0 and status_labels|length == status_data|length %}
+                    <ul class="list-group list-group-flush">
+                        {% for index in 0..(status_labels|length - 1) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ status_labels[index]|default('Inconnu') }}</span>
+                                <span class="badge bg-primary text-white">{{ status_data[index]|default(0) }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucune donnée disponible pour les assurances par statut.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Réservations par statut -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Réservations par statut</h6>
+            </div>
+            <div class="card-body">
+                {% if reservation_status_labels|length > 0 and reservation_status_labels|length == reservation_status_data|length %}
+                    <ul class="list-group list-group-flush">
+                        {% for index in 0..(reservation_status_labels|length - 1) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ reservation_status_labels[index]|default('Inconnu') }}</span>
+                                <span class="badge bg-primary text-white">{{ reservation_status_data[index]|default(0) }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucune donnée disponible pour les réservations par statut.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<!-- Assurances par client -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Assurances par client</h6>
+            </div>
+            <div class="card-body">
+                {% if client_labels|length > 0 and client_labels|length == client_data|length %}
+                    <ul class="list-group list-group-flush">
+                        {% for index in 0..(client_labels|length - 1) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ client_labels[index]|default('Inconnu') }}</span>
+                                <span class="badge bg-primary text-white">{{ client_data[index]|default(0) }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucune donnée disponible pour les assurances par client.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Réservations par client -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Réservations par client</h6>
+            </div>
+            <div class="card-body">
+                {% if reservation_client_labels|length > 0 and reservation_client_labels|length == reservation_client_data|length %}
+                    <ul class="list-group list-group-flush">
+                        {% for index in 0..(reservation_client_labels|length - 1) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ reservation_client_labels[index]|default('Inconnu') }}</span>
+                                <span class="badge bg-primary text-white">{{ reservation_client_data[index]|default(0) }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucune donnée disponible pour les réservations par client.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Réservations par espace de coworking et par transport (côte à côte) -->
+<div class="row mb-4">
+    <!-- Réservations par espace de coworking -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Réservations par espace de coworking</h6>
+            </div>
+            <div class="card-body">
+                {% if coworking_labels|length > 0 and coworking_labels|length == coworking_data|length %}
+                    <ul class="list-group list-group-flush">
+                        {% for index in 0..(coworking_labels|length - 1) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ coworking_labels[index]|default('Inconnu') }}</span>
+                                <span class="badge bg-primary text-white">{{ coworking_data[index]|default(0) }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucune donnée disponible pour les réservations par espace de coworking.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Réservations par transport -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Réservations par transport</h6>
+            </div>
+            <div class="card-body">
+                {% if transport_labels|length > 0 and transport_labels|length == transport_data|length %}
+                    <ul class="list-group list-group-flush">
+                        {% for index in 0..(transport_labels|length - 1) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ transport_labels[index]|default('Inconnu') }}</span>
+                                <span class="badge bg-primary text-white">{{ transport_data[index]|default(0) }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucune donnée disponible pour les réservations par transport.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Script loaded, checking for Chart.js...');
-
-        // Vérifie si Chart.js est chargé
-        if (typeof Chart === 'undefined') {
-            console.error('Chart.js not loaded');
-            return;
-        }
-
-        console.log('Chart.js loaded, initializing pie chart...');
-        var ctx = document.getElementById('statusPieChart');
-        if (!ctx) {
-            console.error('Canvas element with id "statusPieChart" not found');
-            return;
-        }
-        ctx = ctx.getContext('2d');
-        console.log('Canvas found, creating pie chart...');
-
-        try {
-            var statusLabels = {{ status_labels|json_encode|raw }} || ['Aucune donnée'];
-            var statusData = {{ status_data|json_encode|raw }} || [0];
-
-            // Vérifie si les données sont valides
-            if (!statusLabels || statusLabels.length === 0 || statusData.length === 0) {
-                statusLabels = ['Aucune donnée'];
-                statusData = [0];
-            }
-
-            // Affiche le conteneur du graphique et masque la liste
-            document.getElementById('pieChartContainer').style.display = 'block';
-            document.getElementById('statusListContainer').style.display = 'none';
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: statusLabels,
-                    datasets: [{
-                        label: 'Assurances par statut',
-                        data: statusData,
-                        backgroundColor: [
-                            '#4e73df', // Bleu pour Actif
-                            '#858796', // Gris pour Inactif
-                            '#f6c23e', // Jaune pour En attente
-                            '#e74a3b'  // Rouge pour Inconnu
-                        ],
-                        hoverOffset: 20
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 20
-                            }
-                        },
-                        tooltip: {
-                            enabled: true
-                        }
-                    },
-                    cutout: '50%'
-                }
-            });
-            console.log('Pie chart initialized successfully');
-        } catch (error) {
-            console.error('Error initializing pie chart:', error);
-            // Garde la liste visible en cas d'erreur
-            document.getElementById('pieChartContainer').style.display = 'none';
-            document.getElementById('statusListContainer').style.display = 'block';
-        }
-    });
-</script>
+{# Aucun JavaScript requis #}
 {% endblock %}

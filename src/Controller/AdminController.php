@@ -63,17 +63,77 @@ class AdminController extends AbstractController
             }
         }
 
-        // Données pour les assurances par statut (pour le pie chart)
+        // Données pour les assurances par statut
         $assurancesByStatus = $assuranceRepository->countByStatus();
         $statusLabels = [];
         $statusData = [];
-        if (empty($assurancesByStatus)) {
-            $statusLabels = ['Aucune donnée'];
-            $statusData = [0];
+        foreach ($assurancesByStatus as $item) {
+            $statusLabels[] = $item['status'] ?? 'Inconnu';
+            $statusData[] = (int)($item['count'] ?? 0);
+        }
+
+        // Données pour les réservations par statut
+        $reservationsByStatus = $reservationRepository->countByStatus();
+        $reservationStatusLabels = [];
+        $reservationStatusData = [];
+        foreach ($reservationsByStatus as $item) {
+            $reservationStatusLabels[] = $item['status'] ?? 'Inconnu';
+            $reservationStatusData[] = (int)($item['count'] ?? 0);
+        }
+
+        // Données pour les assurances par client
+        $assurancesByClient = $assuranceRepository->countByClient();
+        $clientLabels = [];
+        $clientData = [];
+        if (empty($assurancesByClient)) {
+            $clientLabels = ['Aucun client'];
+            $clientData = [0];
         } else {
-            foreach ($assurancesByStatus as $item) {
-                $statusLabels[] = $item['status'] ?? 'Inconnu';
-                $statusData[] = (int)($item['count'] ?? 0);
+            foreach ($assurancesByClient as $item) {
+                $clientLabels[] = $item['client_name'] ?? 'Client inconnu';
+                $clientData[] = (int)($item['count'] ?? 0);
+            }
+        }
+
+        // Données pour les réservations par client
+        $reservationsByClient = $reservationRepository->countByClient();
+        $reservationClientLabels = [];
+        $reservationClientData = [];
+        if (empty($reservationsByClient)) {
+            $reservationClientLabels = ['Aucun client'];
+            $reservationClientData = [0];
+        } else {
+            foreach ($reservationsByClient as $item) {
+                $reservationClientLabels[] = $item['client_name'] ?? 'Client inconnu';
+                $reservationClientData[] = (int)($item['count'] ?? 0);
+            }
+        }
+
+        // Données pour les réservations par espace de coworking
+        $reservationsByCoworking = $reservationRepository->countByCoworking();
+        $coworkingLabels = [];
+        $coworkingData = [];
+        if (empty($reservationsByCoworking)) {
+            $coworkingLabels = ['Aucun espace'];
+            $coworkingData = [0];
+        } else {
+            foreach ($reservationsByCoworking as $item) {
+                $coworkingLabels[] = $item['coworking_name'] ?? 'Espace inconnu';
+                $coworkingData[] = (int)($item['count'] ?? 0);
+            }
+        }
+
+        // Données pour les réservations par transport
+        $reservationsByTransport = $reservationRepository->countByTransport();
+        $transportLabels = [];
+        $transportData = [];
+        if (empty($reservationsByTransport)) {
+            $transportLabels = ['Aucun transport'];
+            $transportData = [0];
+        } else {
+            foreach ($reservationsByTransport as $item) {
+                $transportLabels[] = $item['transport_name'] ?? 'Transport inconnu';
+                $transportData[] = (int)($item['count'] ?? 0);
             }
         }
 
@@ -86,7 +146,17 @@ class AdminController extends AbstractController
             'hotel_labels' => $hotelLabels,
             'hotel_data' => $hotelData,
             'status_labels' => $statusLabels,
-            'status_data' => $statusData
+            'status_data' => $statusData,
+            'reservation_status_labels' => $reservationStatusLabels,
+            'reservation_status_data' => $reservationStatusData,
+            'client_labels' => $clientLabels,
+            'client_data' => $clientData,
+            'reservation_client_labels' => $reservationClientLabels,
+            'reservation_client_data' => $reservationClientData,
+            'coworking_labels' => $coworkingLabels,
+            'coworking_data' => $coworkingData,
+            'transport_labels' => $transportLabels,
+            'transport_data' => $transportData
         ]);
     }
     #[Route('/loginback', name: 'app_login_back')]

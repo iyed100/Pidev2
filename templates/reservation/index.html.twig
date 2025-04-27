@@ -35,52 +35,52 @@
         }
 
         /* Centrer la pagination et ajouter un espacement */
-.navigation {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
 
-/* Style général de la pagination */
-.pagination {
-    margin: 0;
-}
+        /* Style général de la pagination */
+        .pagination {
+            margin: 0;
+        }
 
-/* Style des éléments de pagination */
-.page-item {
-    margin: 0 2px;
-}
+        /* Style des éléments de pagination */
+        .page-item {
+            margin: 0 2px;
+        }
 
-/* Style des liens de pagination */
-.page-link {
-    border-radius: 5px;
-    color: #007bff; /* Bleu pour les liens, cohérent avec ton thème */
-    background-color: #fff;
-    border: 1px solid #dee2e6;
-    transition: all 0.3s ease;
-}
+        /* Style des liens de pagination */
+        .page-link {
+            border-radius: 5px;
+            color: #007bff; /* Bleu pour les liens, cohérent avec ton thème */
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
 
-/* Style de la page active */
-.page-item.active .page-link {
-    background-color: #007bff; /* Bleu pour la page active */
-    border-color: #007bff;
-    color: #fff; /* Texte blanc pour contraste */
-}
+        /* Style de la page active */
+        .page-item.active .page-link {
+            background-color: #007bff; /* Bleu pour la page active */
+            border-color: #007bff;
+            color: #fff; /* Texte blanc pour contraste */
+        }
 
-/* Style des liens au survol */
-.page-link:hover {
-    background-color: #e9ecef;
-    color: #0056b3;
-    border-color: #dee2e6;
-}
+        /* Style des liens au survol */
+        .page-link:hover {
+            background-color: #e9ecef;
+            color: #0056b3;
+            border-color: #dee2e6;
+        }
 
-/* Style des éléments désactivés */
-.page-item.disabled .page-link {
-    color: #6c757d;
-    background-color: #fff;
-    border-color: #dee2e6;
-    cursor: not-allowed;
-}
+        /* Style des éléments désactivés */
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #fff;
+            border-color: #dee2e6;
+            cursor: not-allowed;
+        }
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -145,8 +145,6 @@
                         </a>
                     </li>
                 </ul>
-
-                
             </div>
         </div>
     </nav>
@@ -181,14 +179,35 @@
                                     <th>Nuits</th>
                                     <th>Heures</th>
                                     <th>Service</th>
-                                    <th>statut</th>
+                                    <th>Statut</th>
+                                    <th>Montant</th> {# Nouvelle colonne Montant #}
                                     <th>Actions</th>
-                                    {# Nouvelle colonne pour le bouton d'assurance #}
                                     <th>Assurance</th>
                                 </tr>
                             </thead>
                             <tbody>
                             {% for reservation in reservations %}
+                                {# Calcul du montant total #}
+                                {% set totalAmount = 0 %}
+                                
+                                {# Coût de l'hôtel : nbrnuit * prixParNuit #}
+                                {% if reservation.hotel and reservation.nbrnuit %}
+                                    {% set hotelCost = reservation.nbrnuit * (reservation.hotel.prixParNuit ?? 0) %}
+                                    {% set totalAmount = totalAmount + hotelCost %}
+                                {% endif %}
+                                
+                                {# Coût du coworking : nbrheure * prixParHeure #}
+                                {% if reservation.coworkingSpace and reservation.nbrheure %}
+                                    {% set coworkingCost = reservation.nbrheure * (reservation.coworkingSpace.prixParHeure ?? 0) %}
+                                    {% set totalAmount = totalAmount + coworkingCost %}
+                                {% endif %}
+                                
+                                {# Coût du transport : prix du transport #}
+                                {% if reservation.transportMean %}
+                                    {% set transportCost = reservation.transportMean.prix ?? 0 %}
+                                    {% set totalAmount = totalAmount + transportCost %}
+                                {% endif %}
+                                
                                 <tr>
                                     <td class="fw-bold">#{{ reservation.id }}</td>
                                     <td>{{ reservation.nbrnuit }}</td>
@@ -202,7 +221,6 @@
                                             {{ reservation.typeservice }}
                                         </span>
                                     </td>
-                                    
                                     <td>
                                         <span class="badge 
                                             {% if reservation.statut == 'confirmé' %}bg-success
@@ -212,6 +230,7 @@
                                             {{ reservation.statut }}
                                         </span>
                                     </td>
+                                    <td>{{ totalAmount|number_format(2, ',', ' ') }} TND</td> {# Affichage du montant #}
                                     <td>
                                         <div class="d-flex">
                                             <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" 
@@ -220,21 +239,19 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             {# Afficher les boutons modifier/supprimer seulement si l'utilisateur n'est pas un client #}
-                                           
-                                                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" 
-                                                   class="btn btn-sm btn-outline-warning me-1"
-                                                   title="Modifier">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" 
-                                                      class="delete-form"
-                                                      onsubmit="return confirm('Supprimer cette réservation ?')">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
-                                                </form>
-                                           
+                                            <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" 
+                                               class="btn btn-sm btn-outline-warning me-1"
+                                               title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" 
+                                                  class="delete-form"
+                                                  onsubmit="return confirm('Supprimer cette réservation ?')">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                     {# Nouvelle colonne avec le bouton "Faire assurance" #}
@@ -258,24 +275,23 @@
                             </tbody>
                         </table>
                     </div>
-         <div class="navigation">
-    <ul class="pagination">
-        <li class="page-item {{ (reservations.getCurrentPageNumber() == 1) ? 'disabled' : '' }}">
-            <a class="page-link" href="{{ (reservations.getCurrentPageNumber() > 1) ? '?page=' ~ (reservations.getCurrentPageNumber() - 1) : '#' }}">&laquo; Previous</a>
-        </li>
-        
-        {% for page in 1..reservations.getPageCount() %}
-            <li class="page-item {{ (page == reservations.getCurrentPageNumber()) ? 'active' : '' }}">
-                <a class="page-link" href="?page={{ page }}">{{ page }}</a>
-            </li>
-        {% endfor %}
-        
-        <li class="page-item {{ (reservations.getCurrentPageNumber() == reservations.getPageCount()) ? 'disabled' : '' }}">
-            <a class="page-link" href="{{ (reservations.getCurrentPageNumber() < reservations.getPageCount()) ? '?page=' ~ (reservations.getCurrentPageNumber() + 1) : '#' }}">Next &raquo;</a>
-        </li>
-    </ul>
-</div>
-        </div>
+                    <div class="navigation">
+                        <ul class="pagination">
+                            <li class="page-item {{ (reservations.getCurrentPageNumber() == 1) ? 'disabled' : '' }}">
+                                <a class="page-link" href="{{ (reservations.getCurrentPageNumber() > 1) ? '?page=' ~ (reservations.getCurrentPageNumber() - 1) : '#' }}">&laquo; Previous</a>
+                            </li>
+                            
+                            {% for page in 1..reservations.getPageCount() %}
+                                <li class="page-item {{ (page == reservations.getCurrentPageNumber()) ? 'active' : '' }}">
+                                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                                </li>
+                            {% endfor %}
+                            
+                            <li class="page-item {{ (reservations.getCurrentPageNumber() == reservations.getPageCount()) ? 'disabled' : '' }}">
+                                <a class="page-link" href="{{ (reservations.getCurrentPageNumber() < reservations.getPageCount()) ? '?page=' ~ (reservations.getCurrentPageNumber() + 1) : '#' }}">Next &raquo;</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
