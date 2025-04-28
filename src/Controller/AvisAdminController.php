@@ -25,12 +25,14 @@ public function index(
     
     // Create response forms for each claim
     $responseForms = [];
-    foreach ($claims as $claim) {
-        $response = new ResponseEntity();
-        $responseForms[$claim->getId()] = $formFactory
-            ->createNamed('response_form_'.$claim->getId(), ResponseType::class, $response)
-            ->createView();
-    }
+foreach ($claims as $claim) {
+    $response = new ResponseEntity();
+    $form = $this->createForm(ResponseType::class, $response, [
+        'action' => $this->generateUrl('admin_claim_response', ['id' => $claim->getId()]),
+        'method' => 'POST'
+    ]);
+    $responseForms[$claim->getId()] = $form->createView();
+}
     
     return $this->render('admin/AvisAdmin.html.twig', [
         'avis' => $avisRepository->findAll(),
@@ -77,7 +79,12 @@ public function addResponse(
             $this->addFlash('error', 'Error saving response: '.$e->getMessage());
         }
     } else {
-        $this->addFlash('error', 'Invalid form submission');
+        // Add more detailed error information
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
+        }
+        $this->addFlash('error', 'Invalid form submission: ' . implode(', ', $errors));
     }
 
     return $this->redirectToRoute('admin_avis');

@@ -37,16 +37,27 @@ public function index(
     $avisForm = $this->createForm(AvisType::class, $avi);
     $avisForm->handleRequest($request);
 
-    if ($avisForm->isSubmitted() && $avisForm->isValid()) {
-        $entityManager->persist($avi);
-        $entityManager->flush();
-        $this->addFlash('success', 'Avis created successfully!');
-        return $this->redirectToRoute('avis_index');
+    if ($avisForm->isSubmitted()) {
+        if ($avisForm->isValid()) {
+            try {
+                $entityManager->persist($avi);
+                $entityManager->flush();
+                $this->addFlash('success', 'Avis created successfully!');
+                return $this->redirectToRoute('avis_index');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Error saving: '.$e->getMessage());
+            }
+        } else {
+            $this->addFlash('error', 'Please fix the errors below');
+            // You can also dump errors for debugging:
+            // dump($avisForm->getErrors(true, true));
+        }
     }
+    $averageNote = $avisRepository->getAverageNote();
 
     // Create claim form
     $claim = new Claim();
-    $claim->setStatus('Pending')
+    $claim->setStatus('En attente')
           ->setCdate(new \DateTime());
     
     $claimForm = $this->createForm(ClaimType::class, $claim);
@@ -66,20 +77,25 @@ public function index(
     $avis = [];
     if ($searchForm->isSubmitted() && $searchForm->isValid()) {
         $searchData = $searchForm->getData();
-        $avis = $avisRepository->search($searchData['keyword']);
+        if (!empty($searchData['keyword'])) {
+            $avis = $avisRepository->search($searchData['keyword']);
+        } else {
+            $avis = $avisRepository->findAll(); // fallback
+        }
     } else {
         $avis = $avisRepository->findAll();
     }
 
     return $this->render('avis/index.html.twig', [
-        'avis' => $avisRepository->findAll(),
+        'avis' => $avis,
         'avis_form' => $avisForm->createView(),
         'claims' => $claimRepository->findAll(),
         'claim_form' => $claimForm->createView(),
         'search_form' => $searchForm->createView(),
         'editing_claim' => null,
         'edit_claim_form' => null,
-        'is_authenticated' => false // Always false since we don't require auth
+        'is_authenticated' => false, // Always false since we don't require auth
+        'average_note' => $averageNote
     ]);
 }
 

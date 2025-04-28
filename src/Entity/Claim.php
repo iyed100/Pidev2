@@ -19,8 +19,8 @@ class Claim
     #[ORM\Column(name: "userId", type: "integer", nullable: true)]
 private int $userId;
 
-    #[ORM\Column(type: "string", length: 255, options: ["default" => "Pending"])]
-    private $status = 'Pending';
+    #[ORM\Column(type: "string", length: 255, options: ["default" => "En attente"])]
+    private $status = 'En attente';
 
     #[ORM\Column(type: "text")]
     private $description;
@@ -125,5 +125,10 @@ private int $userId;
         substr($this->description, 0, 30) . (strlen($this->description) > 30 ? '...' : ''),
         $this->cdate->format('Y-m-d')
     );
+}
+
+public function isEmpty(): bool
+{
+    return empty($this->description);
 }
 }

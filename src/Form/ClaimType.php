@@ -18,7 +18,7 @@ class ClaimType extends AbstractType
     {
         $builder
             ->add('description', TextareaType::class, [
-                'label' => 'Describe your claim',
+                'label' => 'Décrivez votre réclamation',
                 'attr' => ['rows' => 5]
             ]);
     }

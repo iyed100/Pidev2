@@ -18,7 +18,7 @@ class ResponseType extends AbstractType
                 'label' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Enter your response...',
+                    'placeholder' => 'entrez votre réponse...',
                     'rows' => 3
                 ]
             ]);

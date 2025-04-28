@@ -5,7 +5,7 @@
 <div class="card-elegent card mb-4">
     <div class="card-header py-3 bg-primary text-white">
         <h6 class="m-0 font-weight-bold">
-            <i class="fas fa-star me-2"></i> Reviews ({{ avis|length }})
+            <i class="fas fa-star me-2"></i> Avis ({{ avis|length }})
         </h6>
     </div>
     <div class="card-body">
@@ -14,10 +14,10 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Comment</th>
+                        <th>Commentaire</th>
                         <th>Rating</th>
                         <th>User</th>
-                        <th>Actions</th>
+                        <th>Supprimer</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,7 +54,7 @@
 <div class="card-elegent card">
     <div class="card-header py-3 bg-warning text-dark">
         <h6 class="m-0 font-weight-bold">
-            <i class="fas fa-exclamation-triangle me-2"></i> Claims ({{ claims|length }})
+            <i class="fas fa-exclamation-triangle me-2"></i> Réclamations ({{ claims|length }})
         </h6>
     </div>
     <div class="card-body">
@@ -67,7 +67,7 @@
                         <th>Status</th>
                         <th>Date</th>
                         <th>User</th>
-                        <th>Actions</th>
+                        <th>Supprimer</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,9 +79,9 @@
                                 <form method="post" action="{{ path('admin_claim_status', {'id': claim.id}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('status' ~ claim.id) }}">
                                     <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                        <option value="pending" {{ claim.status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="in_progress" {{ claim.status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                        <option value="resolved" {{ claim.status == 'resolved' ? 'selected' : '' }}>Resolved</option>
+                                        <option value="En attente" {{ claim.status == 'En attente' ? 'selected' : '' }}>En attente</option>
+                                        <option value="en cours" {{ claim.status == 'en cours' ? 'selected' : '' }}>en cours</option>
+                                        <option value="résolu" {{ claim.status == 'résolu' ? 'selected' : '' }}>résolu</option>
                                     </select>
                                 </form>
                             </td>
@@ -113,51 +113,27 @@
                         <strong>Response ({{ response.createdAt|date('Y-m-d H:i') }}):</strong>
                         {{ response.content }}
                     </div>
-                    <form method="post" action="{{ path('admin_response_delete', {'id': response.id}) }}"
-                          onsubmit="return confirm('Delete this response?')">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ response.id) }}">
-                        <button class="btn btn-sm btn-danger">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
+                    
+                
                 </div>
             </td>
         </tr>
     {% endfor %}
                         <!-- Response Form (Hidden by Default) -->
                         <tr id="response-form-{{ claim.id }}" style="display:none">
-                            <td colspan="6">
-                                {{ form_start(responseForms[claim.id], {
-                                    'action': path('admin_claim_response', {'id': claim.id}),
-                                    'attr': {'class': 'response-form'}
-                                }) }}
-                                    <div class="input-group mb-3">
-                                        {{ form_widget(responseForms[claim.id].content, {
-                'attr': {
-                    'class': 'form-control',
-                    'placeholder': 'Type your response here...'
-                }
-            }) }}
-                                        <button class="btn btn-primary" type="submit" name="submit">
-                <i class="fas fa-paper-plane"></i> Send
-            </button>
-                                    </div>
-                                    {{ form_rest(responseForms[claim.id]) }}
-                                {{ form_end(responseForms[claim.id]) }}
-                            </td>
-                        </tr>
-                        
-                        <!-- Display Existing Responses -->
-                        {% for response in claim.responses %}
-                            <tr>
-                                <td colspan="6" class="bg-light">
-                                    <small>
-                                        <strong>Response ({{ response.createdAt|date('Y-m-d H:i') }}):</strong>
-                                        {{ response.content }}
-                                    </small>
-                                </td>
-                            </tr>
-                        {% endfor %}
+    <td colspan="6">
+        <form method="post" action="{{ path('admin_claim_response', {'id': claim.id}) }}">
+            {{ form_widget(responseForms[claim.id]) }}
+            <div class="input-group mb-3">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-paper-plane"></i> Envoyer
+                </button>
+            </div>
+            <input type="hidden" name="_token" value="{{ csrf_token('response_' ~ claim.id) }}">
+        </form>
+    </td>
+</tr>
+                       
                     {% else %}
                         <tr><td colspan="6">No claims found</td></tr>
                     {% endfor %}

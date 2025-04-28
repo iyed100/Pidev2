@@ -1,0 +1,31 @@
+{# templates/ai_chat/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}AI Chat{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1>AI Chat Interface</h1>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <form method="post">
+                <div class="mb-3">
+                    <textarea name="message" class="form-control" rows="3" 
+                              placeholder="tapez votre message ici..." required>{{ user_message ?? '' }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+            </form>
+        </div>
+    </div>
+
+    {% if ai_response is defined %}
+    <div class="card mt-3">
+        <div class="card-header bg-success text-white">AI Response</div>
+        <div class="card-body">
+            {{ ai_response|nl2br }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

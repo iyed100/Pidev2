@@ -7,6 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Type;
 
 class AvisType extends AbstractType
 {
@@ -15,7 +17,11 @@ class AvisType extends AbstractType
         $builder
             ->add('serviceId', null, [
                 'label' => 'Service ID',
-                'required' => true
+                'required' => true,
+                'constraints' => [
+        new NotNull(),
+        new Type('integer')
+    ]
             ])
             ->add('note', ChoiceType::class, [
                 'choices' => [
@@ -27,13 +33,15 @@ class AvisType extends AbstractType
                 ],
                 'expanded' => false, // Changed from true
                 'multiple' => false,
-                'label' => 'Rating',
-                'required' => true
+                'label' => 'Rating'
             ])
             ->add('comment', TextareaType::class, [
                 'label' => 'Your Review',
                 'attr' => ['rows' => 5],
-                'required' => true
+                'required' => true,
+                'constraints' => [
+        new NotNull()
+]
             ]);
     }
 

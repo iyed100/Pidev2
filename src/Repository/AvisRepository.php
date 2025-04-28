@@ -33,6 +33,14 @@ class AvisRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function getAverageNote(): float
+{
+    $qb = $this->createQueryBuilder('a')
+        ->select('AVG(a.note) as avgNote')
+        ->where('a.note IS NOT NULL');
+
+    return (float) $qb->getQuery()->getSingleScalarResult();
+}
 //    /**
 //     * @return Avis[] Returns an array of Avis objects
 //     */

@@ -63,7 +63,7 @@ public function edit(
         $this->addFlash('success', 'Claim updated successfully!');
         return $this->redirectToRoute('avis_index');
     }
-
+    $averageNote = $avisRepository->getAverageNote();
     // Initialize forms
     $searchForm = null;
     $responseForm = $this->createForm(ResponseType::class, new ResponseEntity());
@@ -86,7 +86,8 @@ public function edit(
         'search_form' => $searchForm,
         'response_form' => $responseForm->createView(),
         'section_title' => 'Claims Management',
-        'section_description' => 'Manage all your claims in one place'
+        'section_description' => 'Manage all your claims in one place',
+        'average_note' => $averageNote
     ]);
 }
 

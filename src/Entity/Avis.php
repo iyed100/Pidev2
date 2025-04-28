@@ -17,13 +17,23 @@ class Avis
     private $userId;
 
     #[ORM\Column(type: "integer", name: "serviceId")]
-    private $serviceId;
+    #[Assert\NotBlank]
+    #[Assert\NotNull(message: "Service ID cannot be null")]
+    private int $serviceId;
 
     #[ORM\Column(type: "integer", nullable: true)]
     private $note;
 
     #[ORM\Column(type: "string", length: 255)]
-    private $comment;
+    #[Assert\NotNull(message: "Comment cannot be null")]
+    #[Assert\NotBlank(message: "Comment cannot be empty")]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: "Comment must be at least {{ limit }} characters long",
+        maxMessage: "Comment cannot be longer than {{ limit }} characters"
+    )]
+    private string $comment;
 
     // Getters and Setters
     public function getId(): ?int
@@ -74,4 +84,8 @@ class Avis
         $this->comment = $comment;
         return $this;
     }
+    public function isEmpty(): bool
+{
+    return empty($this->note) && empty($this->comment);
+}
 }
