@@ -1,0 +1,9 @@
+knp_snappy:
+    pdf:
+        enabled: true
+        binary: '"/usr/local/bin/wkhtmltopdf"'  # Add quotes around the path
+        options: []
+    image:
+        enabled: true
+        binary: '%env(WKHTMLTOIMAGE_PATH)%'
+        options: []

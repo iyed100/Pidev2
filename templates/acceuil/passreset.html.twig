@@ -1,0 +1,222 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reset mot de pass{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .split-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .image-side {
+            flex: 1;
+            background: url('/images/background.jpg') center/cover no-repeat;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .image-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .form-side {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: white;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+        }
+
+        .login-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 1rem;
+        }
+
+        .btn-login {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            width: 100%;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #6a11cb;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .split-container {
+                flex-direction: column;
+            }
+            
+            .image-side {
+                min-height: 300px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="split-container">
+        <!-- Left Side with Background Image -->
+        <div class="image-side">
+            <div class="image-overlay"></div>
+            <div class="image-content">
+                <h1 class="animate__animated animate__fadeInDown" style="font-size: 2.5rem; margin-bottom: 1rem;">
+                    Content de vous revoir!
+                </h1>
+                <p class="animate__animated animate__fadeInUp" style="font-size: 1.2rem;">
+                    Connectez-vous pour accéder à votre espace personnel
+                </p>
+            </div>
+        </div>
+
+        <!-- Right Side with Form -->
+        <div class="form-side">
+            <div class="login-card animate__animated animate__fadeIn">
+                <h1 class="login-title">Tapez le code de Verification</h1>
+
+                {% if error %}
+                    <script>
+                        alert('{{ error }}');
+                    </script>
+                {% endif %}
+
+                <!-- Reset Code Form -->
+                <form id="code-form" method="post">
+                    <div class="form-group">
+                        <label for="resetCode" class="form-label">Code de réinitialisation</label>
+                        <input 
+                            type="text" 
+                            name="reset_code" 
+                            id="resetCode" 
+                            class="form-control" 
+                            placeholder="Entrez votre code"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <button class="btn-login" type="button" onclick="verifyCode()">
+                            Valider le code
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Password Reset Form (Initially Hidden) -->
+                <form id="password-form" method="post" action="{{ path('handlePassReset') }}" style="display: none;">
+                    <input type="hidden" name="email" value="{{ last_username }}">
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">Nouveau mot de passe</label>
+                        <input 
+                            type="password" 
+                            name="new_password" 
+                            id="newPassword" 
+                            class="form-control" 
+                            placeholder="Mot de passe"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirmer le mot de passe</label>
+                        <input 
+                            type="password" 
+                            name="confirm_password" 
+                            id="confirmPassword" 
+                            class="form-control" 
+                            placeholder="Confirmez le mot de passe"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn-login" type="submit">
+                            Réinitialiser le mot de passe
+                        </button>
+                    </div>
+                </form>
+
+                <script>
+                    const actualCode = '{{ code }}';
+
+                    function verifyCode() {
+                        const codeInput = document.getElementById('resetCode').value;
+
+                        if (codeInput === actualCode) {
+                            document.getElementById('code-form').style.display = 'none';
+                            document.getElementById('password-form').style.display = 'block';
+                        } else {
+                            alert('Code invalide. Veuillez réessayer.');
+                        }
+                    }
+                </script>
+
+
+
+                <div class="signup-link">
+                    <a href="{{ path('app_login') }}">Retour</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
