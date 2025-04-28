@@ -66,7 +66,11 @@ final class UtilisateurController extends AbstractController
         }
 
         return $this->render('utilisateur/edit.html.twig', [
+<<<<<<< HEAD
             'utilisateurs' => $utilisateur,
+=======
+            'utilisateur' => $utilisateur,
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
             'form' => $form,
         ]);
     }

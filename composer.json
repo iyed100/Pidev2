@@ -12,10 +12,14 @@
         "doctrine/doctrine-bundle": "^2.10",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^2.10",
+<<<<<<< HEAD
         "knplabs/knp-paginator-bundle": "^6.8",
         "knplabs/knp-snappy": "^1.5",
         "knplabs/knp-snappy-bundle": "^1.10",
         "pagerfanta/pagerfanta": "^4.7",
+=======
+        "dompdf/dompdf": "^3.1",
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.1",
         "symfony/asset": "6.4.*",

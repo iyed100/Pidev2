@@ -8,7 +8,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Repository\UtilisateurRepository;
+<<<<<<< HEAD
 use Knp\Snappy\Pdf;
+=======
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
 
 class AdminController extends AbstractController
 {
@@ -107,6 +110,7 @@ class AdminController extends AbstractController
             'utilisateurs' => $utilisateurs,
         ]);
     }
+<<<<<<< HEAD
 
     #[Route('/generate-pdf', name: 'generate_pdf')]
     public function generatePdf(Pdf $pdf, UtilisateurRepository $userRepository): Response
@@ -128,4 +132,6 @@ class AdminController extends AbstractController
             'Content-Disposition' => 'inline; filename="users_list.pdf"',
         ]);
     }
+=======
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
 }

@@ -35,6 +35,7 @@
             "./migrations/.gitignore"
         ]
     },
+<<<<<<< HEAD
     "knplabs/knp-paginator-bundle": {
         "version": "v6.8.0"
     },
@@ -50,6 +51,8 @@
             "./config/packages/knp_snappy.yaml"
         ]
     },
+=======
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
     "phpunit/phpunit": {
         "version": "9.6",
         "recipe": {

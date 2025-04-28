@@ -7,7 +7,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+<<<<<<< HEAD
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+=======
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
 
 class RegistrationFormType extends AbstractType
 {
@@ -19,10 +22,14 @@ class RegistrationFormType extends AbstractType
             ->add('age')
             ->add('email')
             ->add('password', PasswordType::class)
+<<<<<<< HEAD
             ->add('recaptcha_token', HiddenType::class, [
                 'mapped' => false,
                 'attr' => ['class' => 'recaptchaToken']
             ]);
+=======
+        ;
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -31,4 +38,8 @@ class RegistrationFormType extends AbstractType
             'data_class' => Utilisateur::class,
         ]);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c6a1bbbd7cabd280f7efea996bf5898048c9380f
